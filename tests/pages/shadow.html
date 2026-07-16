@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Shadow DOM Test</title>
+</head>
+<body>
+  <h1>Shadow host below</h1>
+  <my-widget></my-widget>
+  <script>
+    class MyWidget extends HTMLElement {
+      connectedCallback() {
+        const root = this.attachShadow({ mode: 'open' });
+        root.innerHTML = `
+          <button id="shadow-btn">Shadow button</button>
+          <p>Inside the shadow root</p>
+        `;
+        root.getElementById('shadow-btn').addEventListener('click', () => {
+          root.querySelector('p').textContent = 'shadow clicked';
+        });
+      }
+    }
+    customElements.define('my-widget', MyWidget);
+  </script>
+</body>
+</html>

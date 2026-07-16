@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SPA Nav Test</title>
+  <style>.view { display: none; } .view.active { display: block; }</style>
+</head>
+<body>
+  <nav>
+    <a href="#home" id="nav-home">Home</a>
+    <a href="#about" id="nav-about">About</a>
+  </nav>
+  <div id="home" class="view active">
+    <h1>Home view</h1>
+    <button id="home-cta">Home action</button>
+  </div>
+  <div id="about" class="view">
+    <h1>About view</h1>
+    <button id="about-cta">About action</button>
+  </div>
+  <script>
+    const show = (id) => {
+      document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    };
+    document.getElementById('nav-home').addEventListener('click', () => show('home'));
+    document.getElementById('nav-about').addEventListener('click', () => show('about'));
+  </script>
+</body>
+</html>

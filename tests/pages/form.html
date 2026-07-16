@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Form</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    #menu { display: none; }
+    #menu.open { display: block; }
+  </style>
+</head>
+<body>
+  <h1>Registration</h1>
+  <form id="reg-form">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="Your username">
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Your password">
+
+    <label for="country">Country</label>
+    <select id="country" name="country">
+      <option value="">Choose one</option>
+      <option value="za">South Africa</option>
+      <option value="uk">United Kingdom</option>
+    </select>
+
+    <label><input type="checkbox" id="terms" name="terms"> I accept the terms</label>
+
+    <textarea id="bio" name="bio" placeholder="About you"></textarea>
+
+    <button type="submit" id="submit-btn">Register</button>
+  </form>
+
+  <div id="status">idle</div>
+
+  <button type="button" id="menu-toggle">Open menu</button>
+  <div id="menu">
+    <a href="#profile" id="menu-profile">Profile</a>
+    <a href="#settings" id="menu-settings">Settings</a>
+  </div>
+
+  <a href="https://example.com" id="ext-link">Example site</a>
+
+  <script>
+    document.getElementById('reg-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('status').textContent =
+        'submitted:' + document.getElementById('username').value;
+    });
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.getElementById('menu').classList.add('open');
+    });
+  </script>
+</body>
+</html>

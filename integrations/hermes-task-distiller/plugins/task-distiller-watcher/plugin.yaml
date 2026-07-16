@@ -1,0 +1,11 @@
+name: task-distiller-watcher
+version: 0.1.0
+description: >-
+  Deterministically flags sessions that look like big/expensive agentic tasks (many tool
+  calls, external API/service calls, long wall-clock time) and nudges the agent to run the
+  task-distiller skill on them. Unlike the simple ~/.hermes/hooks/ folder (gateway-only),
+  this is a plugin so it fires in CLI sessions too.
+provides_hooks:
+  - on_session_start
+  - post_tool_call
+  - on_session_end

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scroll Test</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; }
+    .spacer { height: 1200px; background: linear-gradient(#eee, #ccc); }
+    #pane {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #999;
+      width: 300px;
+    }
+    #pane .inner { height: 1500px; }
+  </style>
+</head>
+<body>
+  <h1>Top of page</h1>
+  <div id="pane">
+    <div class="inner">
+      <p>Scrollable pane content top</p>
+    </div>
+  </div>
+  <div class="spacer">tall spacer</div>
+  <button id="bottom-btn">Bottom button</button>
+</body>
+</html>

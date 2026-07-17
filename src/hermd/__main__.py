@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import click
 
 from hermd.browser import Browser
@@ -11,6 +14,45 @@ from hermd.config import Config
 @click.group()
 def main() -> None:
     """hermd: CLI-first browser agent. Headless, text-only DOM, zero screenshots."""
+
+
+@main.command()
+@click.argument("task")
+@click.option("--url", required=True, help="Page to start on.")
+@click.option("--max-steps", type=int, default=None, help="Override MAX_STEPS.")
+@click.option("--verbose", is_flag=True, help="Stream reflection fields per step.")
+def run(task: str, url: str, max_steps: int | None, verbose: bool) -> None:
+    """Run an agent task against a page. Writes a JSONL trace to traces/."""
+    from hermd.agent import Agent
+    from hermd.llm import LLMClient, LLMError
+    from hermd.trace import Trace
+
+    config = Config.from_env()
+    if max_steps is not None:
+        config.max_steps = max_steps
+
+    # Local files: accept plain paths for fixtures.
+    if "://" not in url and Path(url).exists():
+        url = Path(url).resolve().as_uri()
+
+    try:
+        llm = LLMClient(config.llm_endpoints)
+    except LLMError as error:
+        raise click.ClickException(str(error)) from error
+
+    trace = Trace()
+    with Browser(config) as browser:
+        browser.goto(url)
+        agent = Agent(task, browser, llm, config=config, trace=trace, verbose=verbose)
+        result = agent.run()
+
+    click.echo()
+    click.echo(f"{'DONE' if result.success else 'FAILED'} after {result.steps} step(s)")
+    click.echo(result.data)
+    click.echo(f"tokens: {result.usage.get('total_tokens', 0)}  trace: {result.trace_path}")
+    llm.close()
+    trace.close()
+    sys.exit(0 if result.success else 1)
 
 
 @main.command()

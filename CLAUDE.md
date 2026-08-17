@@ -6,8 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `clau-dom` is the Claude binding for the dom-agent workspace: it makes Claude Code the brain
 driving the `hermd` browser engine that lives in `../her-dom/`. Read
-`../DEVELOPMENT_PLAN.md` first; this directory implements Phase 3 of that plan and stays
-empty until Phases 0 to 2 (the engine) are done.
+`../DEVELOPMENT_PLAN.md` first; this directory implements Phase 3 of that plan.
+
+Status: shipped 17 August 2026. `SKILL.md` is the binding. The session primitives it teaches
+live in `../her-dom/src/hermd/session.py` and are covered by `tests/test_session.py` there.
 
 ## The design in one paragraph
 

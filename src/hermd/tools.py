@@ -27,6 +27,61 @@ def _element_handle(page: Page, index: int) -> ElementHandle:
     return element
 
 
+_DESCRIBE_JS = """
+(el) => {
+  const attr = (n) => el.getAttribute(n) || undefined;
+  const cssPath = (node) => {
+    const parts = [];
+    while (node && node.nodeType === 1 && parts.length < 8) {
+      if (node.id) { parts.unshift('#' + CSS.escape(node.id)); break; }
+      const tag = node.tagName.toLowerCase();
+      const parent = node.parentElement;
+      if (!parent) { parts.unshift(tag); break; }
+      const sameTag = [...parent.children].filter((c) => c.tagName === node.tagName);
+      parts.unshift(sameTag.length > 1
+        ? tag + ':nth-of-type(' + (sameTag.indexOf(node) + 1) + ')'
+        : tag);
+      node = parent;
+    }
+    return parts.join(' > ');
+  };
+  return {
+    tag: el.tagName.toLowerCase(),
+    id: el.id || undefined,
+    name: attr('name'),
+    type: attr('type'),
+    role: attr('role'),
+    placeholder: attr('placeholder'),
+    aria_label: attr('aria-label'),
+    href: attr('href'),
+    value_attr: attr('value'),
+    text: (el.innerText || el.textContent || '').trim().slice(0, 80) || undefined,
+    css: cssPath(el),
+    frame_url: el.ownerDocument?.defaultView !== window
+      ? el.ownerDocument?.location?.href
+      : undefined,
+  };
+}
+"""
+
+
+def describe_element(page: Page, index: int) -> dict:
+    """Stable identity for the element at `index`, recorded in the trace.
+
+    Indices die with the snapshot; these attributes are what Phase 5 distillation
+    turns back into Playwright selectors long after the run.
+    """
+    try:
+        element = _element_handle(page, index)
+    except ToolError:
+        return {}
+    try:
+        described = element.evaluate(_DESCRIBE_JS)
+    except Exception:
+        return {}
+    return {k: v for k, v in described.items() if v is not None}
+
+
 def click_element_by_index(page: Page, index: int) -> None:
     element = _element_handle(page, index)
     try:

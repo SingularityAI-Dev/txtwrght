@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head><title>Login fixture</title></head>
+  <body>
+    <h1>Sign in</h1>
+    <form id="login-form" onsubmit="return signIn(event)">
+      <label for="user">Username</label>
+      <input id="user" name="username" type="text" placeholder="Your username" />
+
+      <label for="pass">Password</label>
+      <input id="pass" name="password" type="password" placeholder="Your password" />
+
+      <button id="signin" type="submit">Sign in</button>
+    </form>
+    <p id="status">signed out</p>
+    <script>
+      function signIn(event) {
+        event.preventDefault();
+        const user = document.getElementById('user').value;
+        const pass = document.getElementById('pass').value;
+        const status = document.getElementById('status');
+        // Deliberately slow: the agent must let the page settle before judging.
+        setTimeout(() => {
+          status.textContent =
+            user && pass === 'hunter2' ? 'welcome ' + user : 'invalid credentials';
+        }, 400);
+        return false;
+      }
+    </script>
+  </body>
+</html>

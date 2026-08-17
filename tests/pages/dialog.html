@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head><title>Dialog fixture</title></head>
+  <body>
+    <h1>Dialog fixture</h1>
+    <button id="alert-btn" onclick="alert('heads up'); mark('alert-returned')">
+      Trigger alert
+    </button>
+    <button id="confirm-btn" onclick="mark(confirm('really?') ? 'confirmed' : 'cancelled')">
+      Trigger confirm
+    </button>
+    <p id="status">no dialog yet</p>
+    <script>
+      function mark(text) {
+        document.getElementById('status').textContent = text;
+      }
+    </script>
+  </body>
+</html>

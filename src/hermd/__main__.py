@@ -9,11 +9,26 @@ import click
 
 from hermd.browser import Browser
 from hermd.config import Config
+from hermd.logging import configure as configure_logging
+
+
+def resolve_url(url: str) -> str:
+    """Accept plain filesystem paths for fixtures, not just URLs."""
+    if "://" not in url and Path(url).exists():
+        return Path(url).resolve().as_uri()
+    return url
 
 
 @click.group()
-def main() -> None:
+@click.option(
+    "--log-level",
+    type=click.Choice(["debug", "info", "warning", "error"]),
+    default=None,
+    help="Structured logs to stderr. Default warning (HERMD_LOG_LEVEL).",
+)
+def main(log_level: str | None) -> None:
     """hermd: CLI-first browser agent. Headless, text-only DOM, zero screenshots."""
+    configure_logging(log_level)
 
 
 @main.command()
@@ -27,13 +42,14 @@ def run(task: str, url: str, max_steps: int | None, verbose: bool) -> None:
     from hermd.llm import LLMClient, LLMError
     from hermd.trace import Trace
 
+    if verbose:
+        configure_logging("info")
+
     config = Config.from_env()
     if max_steps is not None:
         config.max_steps = max_steps
 
-    # Local files: accept plain paths for fixtures.
-    if "://" not in url and Path(url).exists():
-        url = Path(url).resolve().as_uri()
+    url = resolve_url(url)
 
     try:
         llm = LLMClient(config.llm_endpoints)
@@ -66,7 +82,7 @@ def run(task: str, url: str, max_steps: int | None, verbose: bool) -> None:
 def snapshot(url: str, viewport_expansion: int | None) -> None:
     """Print the indexed text view of a page and exit."""
     with Browser(Config.from_env()) as browser:
-        browser.goto(url)
+        browser.goto(resolve_url(url))
         state = browser.snapshot(viewport_expansion)
         click.echo(state.render())
 

@@ -26,6 +26,9 @@ class Config:
     llm_endpoints: list[LLMEndpoint] = field(default_factory=list)
     max_steps: int = 40
     step_delay: float = 0.5
+    settle_timeout_ms: int = 3000  # per load-state wait after an action
+    popup_grace_ms: int = 150  # event-channel pump so popups surface before settling
+    dialog_policy: str = "dismiss"  # or "accept"
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -51,4 +54,7 @@ class Config:
             llm_endpoints=endpoints,
             max_steps=int(os.getenv("MAX_STEPS", "40")),
             step_delay=float(os.getenv("STEP_DELAY", "0.5")),
+            settle_timeout_ms=int(os.getenv("SETTLE_TIMEOUT_MS", "3000")),
+            popup_grace_ms=int(os.getenv("POPUP_GRACE_MS", "150")),
+            dialog_policy=os.getenv("DIALOG_POLICY", "dismiss").strip().lower(),
         )

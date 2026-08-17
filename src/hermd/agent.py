@@ -21,7 +21,10 @@ from hermd import tools
 from hermd.browser import Browser
 from hermd.config import Config
 from hermd.llm import LLMClient, LLMError, LLMResult
+from hermd.logging import get_logger
 from hermd.trace import Trace
+
+log = get_logger(__name__)
 
 SYSTEM_PROMPT = (
     resources.files("hermd.prompts").joinpath("system_prompt.md").read_text()
@@ -119,9 +122,14 @@ class Agent:
                     result = self._finish(success, data, step + 1)
                     break
 
+                # Element identity is captured before acting: the element can be
+                # gone a millisecond later, and Phase 5 distillation needs it.
+                element = self._describe_target(action_input)
+
                 act_started = time.time()
                 try:
                     output = self._execute_action(action_name, action_input)
+                    self.browser.settle()
                 except tools.ToolError as error:
                     output = f"Error: {error}"
                 act_duration = round(time.time() - act_started, 3)
@@ -131,10 +139,18 @@ class Agent:
                     step=step,
                     action=action_name,
                     input=self._scrub_action(llm_result.action)[action_name],
+                    element=element,
                     output=output,
                     duration=act_duration,
                 )
                 self.history.append(self._step_event(step, llm_result, output))
+                log.info(
+                    "step",
+                    step=step,
+                    action=action_name,
+                    url=state.url,
+                    duration=act_duration,
+                )
                 if self.verbose:
                     print(f"  -> {output}")
 
@@ -169,7 +185,17 @@ class Agent:
 
     # -- observe ----------------------------------------------------------
 
+    def _describe_target(self, args: dict[str, Any]) -> dict[str, Any]:
+        page = self.browser.page
+        index = args.get("index") if isinstance(args, dict) else None
+        if page is None or not isinstance(index, int):
+            return {}
+        return tools.describe_element(page, index)
+
     def _handle_observations(self, url: str, step: int) -> None:
+        # Popups, adopted tabs and auto-handled dialogs are the browser's news.
+        self._observations.extend(self.browser.drain_events())
+
         if self._total_wait_time >= 3:
             self._observations.append(
                 f"You have waited {self._total_wait_time:.0f} seconds accumulatively. "

@@ -13,6 +13,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+SCRUBBED = "***scrubbed***"
+
+
+def scrub_args(args: Any, element: dict[str, Any] | None) -> Any:
+    """Blank text typed into a password field before it reaches the trace.
+
+    Uses the element descriptor captured at action time, so it holds for any
+    driver: the autonomous loop and the per-step session CLI alike.
+    """
+    if not isinstance(args, dict) or "text" not in args:
+        return args
+    if (element or {}).get("type") == "password":
+        return dict(args, text=SCRUBBED)
+    return args
+
 
 class Trace:
     def __init__(self, directory: str | Path = "traces", run_id: str | None = None):

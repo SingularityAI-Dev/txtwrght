@@ -22,16 +22,13 @@ from hermd.browser import Browser
 from hermd.config import Config
 from hermd.llm import LLMClient, LLMError, LLMResult
 from hermd.logging import get_logger
-from hermd.trace import Trace
+from hermd.trace import SCRUBBED, Trace
 
 log = get_logger(__name__)
 
 SYSTEM_PROMPT = (
     resources.files("hermd.prompts").joinpath("system_prompt.md").read_text()
 )
-
-SCRUBBED = "***scrubbed***"
-
 
 @dataclass
 class ExecutionResult:

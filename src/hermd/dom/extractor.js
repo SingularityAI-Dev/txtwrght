@@ -1627,6 +1627,24 @@ const domTree = (
 			) {
 				nodeData.attributes.checked = node.checked ? 'true' : 'false' // Store as string for consistency
 			}
+
+			/**
+			 * @edit @workaround live value
+			 * Typing sets the value property, never the attribute, so without
+			 * this the driver cannot see what it just typed. Password fields
+			 * report presence only: their contents belong in neither the model
+			 * context nor the trace.
+			 */
+			const liveValueTag = ['input', 'textarea', 'select'].includes(
+				node.tagName.toLowerCase()
+			)
+			if (liveValueTag && typeof node.value === 'string') {
+				if (node.type === 'password') {
+					nodeData.attributes.value = node.value ? '***' : ''
+				} else if (node.value) {
+					nodeData.attributes.value = node.value
+				}
+			}
 		}
 
 		let nodeWasHighlighted = false

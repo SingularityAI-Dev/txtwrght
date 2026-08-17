@@ -22,6 +22,27 @@ _EXTRACTOR_JS = resources.files("hermd.dom").joinpath("extractor.js").read_text(
 
 log = get_logger(__name__)
 
+_DOM_QUIET_JS = """
+(cfg) => new Promise((resolve) => {
+  let last = performance.now();
+  const started = last;
+  const observer = new MutationObserver(() => { last = performance.now(); });
+  observer.observe(document.documentElement, {
+    subtree: true, childList: true, attributes: true, characterData: true,
+  });
+  const tick = () => {
+    const now = performance.now();
+    if (now - last >= cfg.quietMs || now - started >= cfg.capMs) {
+      observer.disconnect();
+      resolve(Math.round(now - started));
+    } else {
+      setTimeout(tick, 25);
+    }
+  };
+  setTimeout(tick, 25);
+})
+"""
+
 
 class Browser:
     def __init__(self, config: Config | None = None, playwright: Playwright | None = None):
@@ -154,6 +175,26 @@ class Browser:
                 page.wait_for_load_state(state, timeout=timeout)
             except Exception:
                 break  # still loading; the next snapshot sees whatever is there
+
+        self._wait_for_dom_quiet()
+
+    def _wait_for_dom_quiet(self) -> None:
+        """Wait until the DOM stops changing, or the settle budget runs out.
+
+        Client-rendered pages finish loading long before they finish rendering.
+        networkidle says nothing about a framework still writing to the DOM, so
+        we watch mutations directly and stop once they pause.
+        """
+        page = self.page
+        quiet_ms = self.config.dom_quiet_ms
+        if page is None or page.is_closed() or quiet_ms <= 0:
+            return
+        try:
+            page.evaluate(
+                _DOM_QUIET_JS, {"quietMs": quiet_ms, "capMs": self.config.settle_timeout_ms}
+            )
+        except Exception:
+            pass  # navigated mid-wait, or the context went away: not fatal
 
     # -- observation -------------------------------------------------------
 

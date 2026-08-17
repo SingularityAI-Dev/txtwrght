@@ -82,13 +82,40 @@ def describe_element(page: Page, index: int) -> dict:
     return {k: v for k, v in described.items() if v is not None}
 
 
+_WATCH_CLICK = """
+(el) => {
+  const doc = el.ownerDocument;
+  doc.__hermdClickSeen = false;
+  doc.addEventListener('click', () => { doc.__hermdClickSeen = true; },
+    { capture: true, once: true });
+}
+"""
+
+
 def click_element_by_index(page: Page, index: int) -> None:
     element = _element_handle(page, index)
+    try:
+        element.evaluate(_WATCH_CLICK)
+    except Exception:
+        pass
+
     try:
         element.click(timeout=2000)
     except Exception:
         # Overlay interception or off-screen geometry: dispatch in-page,
         # which is what page-agent itself does.
+        element.evaluate("(el) => el.click()")
+        return
+
+    # A reported click is not a delivered click. Over connect_over_cdp (which is
+    # how session commands attach) Playwright can return success while the
+    # browser drops the synthesized event, leaving the page untouched and the
+    # driver convinced it acted.
+    try:
+        delivered = element.evaluate("(el) => el.ownerDocument.__hermdClickSeen === true")
+    except Exception:
+        return  # the context died with the click: it navigated, so it landed
+    if not delivered:
         element.evaluate("(el) => el.click()")
 
 

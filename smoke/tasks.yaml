@@ -1,0 +1,103 @@
+# Phase 1 exit gate: ten live tasks, a recorded trace each, a pass rate.
+#
+# Half are fixtures (deterministic, free, they isolate one engine capability
+# each) and half are real sites (messy, they are what the fixtures are a proxy
+# for). Target is 8 of 10 before the engine counts as real.
+#
+# verify kinds:
+#   js              - expression evaluated in the final page, must be truthy
+#   frame_js        - same, evaluated in the first child frame
+#   url_contains    - final page URL must contain this
+#   answer_contains - the agent's own done text must contain this (lowercased)
+
+- id: form-fill
+  kind: fixture
+  url: form.html
+  task: Fill in the username field with "geez" and submit the form.
+  max_steps: 10
+  verify:
+    js: "document.getElementById('status').textContent === 'submitted:geez'"
+
+- id: login-flow
+  kind: fixture
+  url: login.html
+  task: Sign in with the username "geez" and the password "hunter2".
+  max_steps: 10
+  verify:
+    js: "document.getElementById('status').textContent.includes('welcome geez')"
+
+- id: dropdown-select
+  kind: fixture
+  url: form.html
+  task: Set the country dropdown to South Africa. Do not submit the form.
+  max_steps: 10
+  verify:
+    js: "document.getElementById('country').value === 'za'"
+
+- id: scroll-and-read
+  kind: fixture
+  url: scroll.html
+  task: >
+    Scroll to the bottom of the page and tell me the text of the last
+    paragraph there.
+  max_steps: 15
+  verify:
+    answer_contains: "bottom"
+
+- id: shadow-dom-click
+  kind: fixture
+  url: shadow.html
+  task: Click the button inside the widget.
+  max_steps: 10
+  verify:
+    js: >
+      document.querySelector('my-widget').shadowRoot
+        .querySelector('p').textContent === 'shadow clicked'
+
+- id: iframe-input
+  kind: fixture
+  url: iframe.html
+  task: Type "geez" into the field inside the frame, then click the inner button.
+  max_steps: 12
+  verify:
+    frame_js: >
+      document.getElementById('inner-input').value === 'geez'
+      && document.getElementById('inner-status').textContent === 'inner clicked'
+
+- id: spa-navigation
+  kind: fixture
+  url: spa.html
+  task: Navigate to the About section and tell me what it says.
+  max_steps: 12
+  verify:
+    answer_contains: "about"
+
+- id: popup-tab
+  kind: fixture
+  url: popup.html
+  task: >
+    Open the link that opens in a new tab, then tell me the status text on the
+    page that opens.
+  max_steps: 12
+  verify:
+    url_contains: "popup-child.html"
+
+- id: real-login
+  kind: live
+  url: https://the-internet.herokuapp.com/login
+  task: >
+    Log in with the username "tomsmith" and the password
+    "SuperSecretPassword!", then confirm you reached the secure area.
+  max_steps: 15
+  verify:
+    url_contains: "/secure"
+
+- id: real-extract
+  kind: live
+  url: https://news.ycombinator.com
+  task: >
+    Tell me the title of the very first story on the front page. Do not click
+    anything.
+  max_steps: 8
+  verify:
+    answer_min_length: 15

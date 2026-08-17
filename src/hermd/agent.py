@@ -170,7 +170,14 @@ class Agent:
 
     def _finish(self, success: bool, data: str, steps: int) -> ExecutionResult:
         self.trace.write(
-            "task_end", success=success, data=data, steps=steps, usage=self._usage
+            "task_end",
+            success=success,
+            data=data,
+            steps=steps,
+            usage=self._usage,
+            # A run this long is worth replaying deterministically: hermd distill
+            # turns this trace into a Playwright script.
+            distill_candidate=success and steps >= self.config.distill_threshold,
         )
         return ExecutionResult(
             success=success,

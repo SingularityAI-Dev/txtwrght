@@ -151,3 +151,12 @@ def test_password_value_is_masked_in_the_view(live_session):
     view = sess.act("input", {"index": 3, "text": "hunter2"})["state"]
     assert "hunter2" not in view
     assert "value=***" in view
+
+
+def test_a_plain_link_click_actually_navigates(live_session, page_server):
+    """Regression: over CDP a click can report success and never be delivered."""
+    sess.act("goto", {"url": f"{page_server}/link.html"})
+    result = sess.act("click", {"index": 0})
+
+    assert "popup-child.html" in result["state"]
+    assert "Second tab" in result["state"]

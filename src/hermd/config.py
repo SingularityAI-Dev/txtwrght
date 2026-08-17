@@ -30,6 +30,7 @@ class Config:
     popup_grace_ms: int = 150  # event-channel pump so popups surface before settling
     dom_quiet_ms: int = 250  # mutations must pause this long before a page counts as settled
     dialog_policy: str = "dismiss"  # or "accept"
+    distill_threshold: int = 5  # runs at least this long are flagged worth distilling
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -59,4 +60,5 @@ class Config:
             popup_grace_ms=int(os.getenv("POPUP_GRACE_MS", "150")),
             dom_quiet_ms=int(os.getenv("DOM_QUIET_MS", "250")),
             dialog_policy=os.getenv("DIALOG_POLICY", "dismiss").strip().lower(),
+            distill_threshold=int(os.getenv("DISTILL_THRESHOLD", "5")),
         )

@@ -87,6 +87,39 @@ def snapshot(url: str, viewport_expansion: int | None) -> None:
         click.echo(state.render())
 
 
+@main.command()
+@click.argument("trace", type=click.Path(exists=True))
+@click.option("--out-dir", default="distilled", help="Staging directory for the script.")
+@click.option("--name", default=None, help="Script filename.")
+@click.option("--verify", is_flag=True, help="Replay the script and report the result.")
+def distill(trace: str, out_dir: str, name: str | None, verify: bool) -> None:
+    """Turn a recorded run into a plain Playwright script.
+
+    The script goes to a staging directory. Read it, replay it, and only then
+    treat it as something you can schedule.
+    """
+    from hermd.distill import DistillError
+    from hermd.distill import distill as distill_trace
+
+    try:
+        result = distill_trace(trace, out_dir=out_dir, name=name, verify=verify)
+    except DistillError as error:
+        raise click.ClickException(str(error)) from error
+
+    click.echo(f"{result['script']}  ({result['steps']} step(s))")
+    if result["secrets"]:
+        click.echo("needs in the environment: " + ", ".join(result["secrets"]))
+    if verify:
+        if result["verified"] is None:
+            click.echo(result["output"])
+        else:
+            click.echo("replay: " + ("passed" if result["verified"] else "FAILED"))
+            if result["output"]:
+                click.echo(result["output"])
+            if not result["verified"]:
+                sys.exit(1)
+
+
 @main.group()
 def session() -> None:
     """Drive a page step by step, with the browser living between commands.

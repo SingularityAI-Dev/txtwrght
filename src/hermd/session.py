@@ -449,6 +449,15 @@ def end() -> dict[str, Any]:
     """Kill the browser, keep the trace."""
     session = _read_session()
     trace_path = Path("traces") / f"run-{session['run_id']}.jsonl"
+    steps = session.get("step", 0)
+
+    if trace_path.exists():
+        with Trace(run_id=session["run_id"]) as trace:
+            trace.write(
+                "session_end",
+                steps=steps,
+                distill_candidate=steps >= Config.from_env().distill_threshold,
+            )
 
     if _process_alive(session["pid"]):
         try:
@@ -466,7 +475,7 @@ def end() -> dict[str, Any]:
     shutil.rmtree(session.get("profile", ""), ignore_errors=True)
     SESSION_FILE.unlink(missing_ok=True)
     log.info("session_ended", pid=session["pid"])
-    return {"steps": session.get("step", 0), "trace": str(trace_path)}
+    return {"steps": steps, "trace": str(trace_path)}
 
 
 def status() -> dict[str, Any]:

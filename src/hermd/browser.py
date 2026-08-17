@@ -169,6 +169,21 @@ class Browser:
         page = self.page  # a popup may have taken over during the grace wait
         if page is None or page.is_closed():
             return
+
+        # A click that triggers a server-side redirect can commit its navigation
+        # after the first pass has already finished waiting. Settling again when
+        # the URL moved under us is what keeps the recorded state honest.
+        for _ in range(2):
+            before = self.page.url if self.page else ""
+            self._settle_once()
+            after = self.page.url if self.page else ""
+            if after == before:
+                return
+
+    def _settle_once(self) -> None:
+        page = self.page
+        if page is None or page.is_closed():
+            return
         timeout = self.config.settle_timeout_ms
         for state in ("domcontentloaded", "networkidle"):
             try:

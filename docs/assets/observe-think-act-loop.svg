@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="Animated loop: observe the indexed page, think one action, act on it through Playwright, then observe again. Indices are only valid for the snapshot that produced them.">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .node-purple { fill: #161b22; stroke: #7c6fe0; stroke-width: 2; }
+      .node-green { fill: #161b22; stroke: #2db88a; stroke-width: 2; }
+      .node-orange { fill: #161b22; stroke: #e07050; stroke-width: 2; }
+      .title { fill: #c9d1d9; font: 600 18px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.04em; }
+      .subtitle { fill: #8b949e; font: 400 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+      .label { fill: #c9d1d9; font: 700 17px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.03em; }
+      .sub { fill: #8b949e; font: 400 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+      .tag { fill: #8b949e; font: 600 10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.14em; }
+      .warn-label { fill: #e3b341; font: 600 11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.06em; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="520"/>
+
+  <text x="600" y="40" text-anchor="middle" class="title">OBSERVE → THINK → ACT</text>
+  <text x="600" y="62" text-anchor="middle" class="subtitle">one action per step · indices die at the next snapshot</text>
+
+  <!-- Observe -->
+  <g transform="translate(80,180)">
+    <rect class="node-purple" width="280" height="140" rx="12"/>
+    <text x="20" y="28" class="tag" fill="#7c6fe0">OBSERVE</text>
+    <text x="20" y="62" class="label">snapshot</text>
+    <text x="20" y="86" class="sub">extractor walks the live DOM</text>
+    <text x="20" y="104" class="sub">*[n] on anything new since last look</text>
+    <text x="20" y="122" class="sub">page text is the entire prompt</text>
+  </g>
+
+  <!-- Think -->
+  <g transform="translate(460,180)">
+    <rect class="node-green" width="280" height="140" rx="12"/>
+    <text x="20" y="28" class="tag" fill="#2db88a">THINK</text>
+    <text x="20" y="62" class="label">one action</text>
+    <text x="20" y="86" class="sub">reflection, then a single tool call</text>
+    <text x="20" y="104" class="sub">click · type · scroll · select · wait</text>
+    <text x="20" y="122" class="sub">no vision, text in and text out</text>
+  </g>
+
+  <!-- Act -->
+  <g transform="translate(840,180)">
+    <rect class="node-orange" width="280" height="140" rx="12"/>
+    <text x="20" y="28" class="tag" fill="#e07050">ACT</text>
+    <text x="20" y="62" class="label">execute</text>
+    <text x="20" y="86" class="sub">Playwright dispatches the real event</text>
+    <text x="20" y="104" class="sub">settle: load state + DOM-quiet wait</text>
+    <text x="20" y="122" class="sub">popups and dialogs handled inline</text>
+  </g>
+
+  <!-- Forward edges with flowing packets -->
+  <g fill="none" stroke-width="2">
+    <path d="M 360 250 L 460 250" stroke="#7c6fe0"/>
+    <path d="M 740 250 L 840 250" stroke="#2db88a"/>
+  </g>
+  <circle r="6" fill="#7c6fe0">
+    <animateMotion dur="2.2s" repeatCount="indefinite" path="M 360 250 L 460 250"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="6" fill="#2db88a">
+    <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" path="M 740 250 L 840 250"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.2s" begin="1.1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Return loop: Act back to Observe, arcing below -->
+  <g fill="none" stroke="#e07050" stroke-width="1.8" stroke-dasharray="5 4">
+    <path d="M 900 320 C 900 420, 300 420, 220 320">
+      <animate attributeName="stroke-dashoffset" values="0;-40" dur="1.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  <polygon points="222,318 214,310 226,306" fill="#e07050"/>
+  <text x="560" y="404" text-anchor="middle" class="sub" fill="#8b949e">indices are only valid for THIS snapshot — every act() invalidates them, observe() regenerates from zero</text>
+
+  <!-- Step budget warning callout -->
+  <g transform="translate(460,90)">
+    <text x="140" y="0" text-anchor="middle" class="warn-label">STEP BUDGET · &lt;sys&gt; NOTE AT 5 AND 2 REMAINING</text>
+    <text x="140" y="18" text-anchor="middle" class="sub">a URL change also lands as a &lt;sys&gt; observation mid-loop</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(80,470)">
+    <circle cx="10" cy="-4" r="5" fill="#7c6fe0"/>
+    <text x="22" y="0" class="sub">indexed text</text>
+    <circle cx="160" cy="-4" r="5" fill="#2db88a"/>
+    <text x="172" y="0" class="sub">one tool call</text>
+    <circle cx="320" cy="-4" r="5" fill="#e07050"/>
+    <text x="332" y="0" class="sub">real DOM event</text>
+    <text x="1120" y="0" text-anchor="end" class="sub">done / fail ends the loop, not a step limit alone</text>
+  </g>
+</svg>

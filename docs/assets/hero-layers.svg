@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560" role="img" aria-label="hermd sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer.">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .panel { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+      .panel-core { fill: #161b22; stroke: #7c6fe0; stroke-width: 2; }
+      .title { fill: #c9d1d9; font: 600 18px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.04em; }
+      .subtitle { fill: #8b949e; font: 400 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+      .label-core { fill: #7c6fe0; font: 700 24px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.05em; }
+      .label-green { fill: #2db88a; font: 700 16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.03em; }
+      .label-orange { fill: #e07050; font: 700 16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.03em; }
+      .label-blue { fill: #58a6ff; font: 700 16px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.03em; }
+      .tag { fill: #8b949e; font: 600 11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.14em; }
+      .muted { fill: #8b949e; font: 400 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+      .accent-purple { stroke: #7c6fe0; }
+    </style>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7c6fe0" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#7c6fe0" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#7c6fe0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect class="bg" width="1200" height="560"/>
+
+  <text x="600" y="40" text-anchor="middle" class="title">hermd — THE TEXT-ONLY INTERFACE LAYER</text>
+  <text x="600" y="62" text-anchor="middle" class="subtitle">headless · no screenshots · no multimodal model</text>
+
+  <!-- Top: real browser -->
+  <g transform="translate(120,96)">
+    <rect class="panel" width="960" height="84" rx="10"/>
+    <text x="20" y="24" class="tag">REAL BROWSER</text>
+    <text x="20" y="56" class="title">Playwright drives Chromium — real DOM, real events, real network</text>
+    <text x="20" y="76" class="muted">not a scraped copy, not a headless simulation of the page</text>
+  </g>
+
+  <!-- Core: extractor + serializer, pulsing -->
+  <g transform="translate(200,212)">
+    <ellipse cx="400" cy="56" rx="520" ry="100" fill="url(#glow)">
+      <animate attributeName="opacity" values="0.35;0.9;0.35" dur="3.6s" repeatCount="indefinite"/>
+    </ellipse>
+
+    <rect class="panel-core" width="800" height="112" rx="12">
+      <animate attributeName="stroke-opacity" values="0.55;1;0.55" dur="3.6s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="30" y="32" class="tag" fill="#7c6fe0">THE PROMPT CONTRACT</text>
+    <text x="30" y="72" class="label-core">indexed text view</text>
+
+    <g transform="translate(340,44)">
+      <text x="0" y="0" class="muted">DOM extractor (injected JS)</text>
+      <text x="0" y="20" class="muted">flat tree, [n] index per element</text>
+      <text x="0" y="40" class="muted">*[n] marks new-since-last-snapshot</text>
+    </g>
+    <g transform="translate(590,44)">
+      <text x="0" y="0" class="muted">no pixels</text>
+      <text x="0" y="20" class="muted">no vision model</text>
+      <text x="0" y="40" class="muted">one line per element</text>
+    </g>
+  </g>
+
+  <!-- Feed-in tick -->
+  <g stroke-width="1.5" fill="none" opacity="0.9">
+    <line x1="600" y1="180" x2="600" y2="212" class="accent-purple" stroke-dasharray="4 4">
+      <animate attributeName="stroke-dashoffset" values="0;-16" dur="1.2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Bottom: three modes -->
+  <g transform="translate(70,398)">
+    <rect class="panel" width="340" height="120" rx="10" stroke="#58a6ff" stroke-width="2"/>
+    <text x="20" y="26" class="tag">AUTONOMOUS</text>
+    <text x="20" y="58" class="label-blue">hermd run</text>
+    <text x="20" y="80" class="muted">engine's own loop calls an LLM</text>
+    <text x="20" y="98" class="muted">one action per step, max N steps</text>
+  </g>
+
+  <g transform="translate(430,398)">
+    <rect class="panel" width="340" height="120" rx="10" stroke="#2db88a" stroke-width="2"/>
+    <text x="20" y="26" class="tag">DRIVEN</text>
+    <text x="20" y="58" class="label-green">hermd session</text>
+    <text x="20" y="80" class="muted">outer agent is the loop</text>
+    <text x="20" y="98" class="muted">no second model in the path</text>
+  </g>
+
+  <g transform="translate(790,398)">
+    <rect class="panel" width="340" height="120" rx="10" stroke="#e07050" stroke-width="2"/>
+    <text x="20" y="26" class="tag">DISTILLED</text>
+    <text x="20" y="58" class="label-orange">hermd distill</text>
+    <text x="20" y="80" class="muted">recorded run → Playwright script</text>
+    <text x="20" y="98" class="muted">zero model at replay time</text>
+  </g>
+
+  <!-- Feed-out ticks -->
+  <g stroke-width="1.5" fill="none" opacity="0.9">
+    <line x1="240" y1="324" x2="240" y2="398" stroke="#58a6ff" stroke-dasharray="4 4">
+      <animate attributeName="stroke-dashoffset" values="0;16" dur="1.3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="600" y1="324" x2="600" y2="398" stroke="#2db88a" stroke-dasharray="4 4">
+      <animate attributeName="stroke-dashoffset" values="0;16" dur="1.3s" begin="0.3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="960" y1="324" x2="960" y2="398" stroke="#e07050" stroke-dasharray="4 4">
+      <animate attributeName="stroke-dashoffset" values="0;16" dur="1.3s" begin="0.6s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <text x="600" y="542" text-anchor="middle" class="muted">one engine, three ways to spend a model's attention — including not spending one at all</text>
+</svg>

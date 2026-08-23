@@ -31,12 +31,18 @@ a plain Playwright script with no model in it (`hermd distill`). 92 tests green.
 
 ## Next
 
-- Open-source readiness: README for the engine, MIT attribution chain
-  (page-agent, browser-use) checked once more before anything is published.
-- Distillation has one live proof and unit coverage. It wants a second real
-  flow, ideally one with a redirect chain, before it is trusted unattended.
-- Cross-origin iframes stay out of scope. Say so in the README rather than
-  letting a user discover it.
+- Open-source readiness: DONE 22 August 2026. `README.md` shipped; attribution
+  chain checked against `LICENSE` and both upstream repos, nothing to fix.
+- Distillation second proof: DONE 22 August 2026. Live run against
+  `the-internet.herokuapp.com/redirector` (a real redirect chain, `/redirect`
+  303s to `/status_codes`), 2 steps, distilled and replay-verified. Two live
+  proofs now (login flow, redirect chain).
+- Cross-origin iframes: documented in the README as an explicit limit rather
+  than a bug a user finds by accident.
 - `hermd run` has never been driven by anything but claude-sonnet-5 through
   CLIProxyAPI. A second model on the same gate would tell us whether the
-  serialized-page contract or the prompt is doing the work.
+  serialized-page contract or the prompt is doing the work. **Deferred by
+  choice, 23 August 2026**: no Gemini credential exists on this machine
+  (CLIProxyAPI's `gemini-api-key` block is commented out, no `GEMINI_API_KEY`
+  in the shell profile), and Rainier chose not to wire one up for this.
+  Nothing blocking a pickup later beyond that same credential decision.

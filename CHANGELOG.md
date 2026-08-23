@@ -2,6 +2,13 @@
 
 > Last 20 changes. Full history in git.
 
+- 2026-08-22: Two of three post-gate roadmap items closed. `README.md`
+  shipped (install, three modes, iframe limitation, attribution chain).
+  Second distillation proof: live run against
+  the-internet.herokuapp.com/redirector (redirect chain, not another form),
+  2 steps, distilled to `distilled/run_20260822_195456.py`, replay verified.
+  Third item (second model, non-Claude, through the smoke gate) blocked: no
+  Gemini credential available on this machine, see STATUS.md.
 - 2026-08-20: Phase 1 exit gate PASSED, 10 of 10 (gate was 8 of 10), 181,851 tokens, 173s total, one trace per task in `smoke/RESULTS.md`. Every capability the fixtures isolate held under a real model (form, login, dropdown, scroll-and-read, shadow DOM, iframe, SPA, popup tab) and both live sites passed: herokuapp login reached /secure in 4 steps, Hacker News front-page extraction in 1. The engine is real by its own definition; all of DEVELOPMENT_PLAN.md phases 0 to 5 are now closed.
 - 2026-08-17: Phase 5 distillation + Phase 1 smoke harness. `hermd distill <trace>` rebuilds selectors from recorded element identity and emits a plain Playwright script into staging; scrubbed passwords become os.environ lookups; --verify replays. Long successful runs flagged as distill candidates (DISTILL_THRESHOLD). Fixed a real bug the replay exposed: over connect_over_cdp Playwright reports clicks as successful while the browser drops the event, so session clicks silently did nothing on real sites; clicks now verify delivery and fall back to in-page dispatch. settle() re-settles when a navigation commits under it. smoke/ holds the ten-task exit gate (verified against page, frame, URL or the agent's own answer; resumable; one probe call up front). 92 tests green.
 - 2026-08-17: Phase 3 session CLI (`hermd session start/snapshot/act/tabs/switch/status/end`): Chromium launched detached with a debugging port, every command reconnects over CDP, so the browser outlives the CLI process and the caller is the loop. Tabs tracked by CDP target id, not position. Passwords scrubbed from session traces (they leaked in plaintext before). Extractor now reflects live input values into the view, passwords as ***. clau-dom SKILL.md and gem-dom GEMINI.md ship the bindings. Proven by driving the-internet.herokuapp.com/login end to end with no model in the loop.

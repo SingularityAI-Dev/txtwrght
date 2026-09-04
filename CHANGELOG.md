@@ -2,16 +2,28 @@
 
 > Last 20 changes. Full history in git.
 
+- 2026-09-04: Rethemed the three animated README diagrams (`docs/assets/{hero-layers,observe-think-act-loop,distill-flow}.svg`) off GitHub's own dark palette onto the palette singlesource.co.za/txtwrght/ uses: warm near-black ground, amber core, sage driven path, clay distillation, one dusty blue as the sole cool hue, IBM Plex Mono in place of the generic mono stack. The same retheme landed in the site's copy of the page (`SingleSourceStudios/singlesource-site@e0ffa4e`), since the site page inlines these same three diagrams and the two must move together. Measuring rather than eyeballing caught two defects: Plex Mono is wider than the stack these were drawn against, so 12px panel text reached the panel edge (dropped to 11.5px); and both `animateMotion` packets with a `begin` delay were parking at the SVG origin fully opaque for the first ~1.2s of every load (now `opacity="0"` at rest). Pushed as `aeebeb9`, then `14e4065` fixed the same origin-flash bug in the site's inline copy.
+- 2026-09-04: Added a fourth diagram, `docs/assets/hero-banner.svg`, and put it at the top of `README.md`. Built as SVG rather than a screenshot of the live page, since GitHub strips page CSS from an embedded screenshot and a raster image would not scale, would not survive a future palette change, and could not carry the blinking cursor after the wordmark. Chip boxes, the cursor gap and the widest code line were all measured in a browser against the rendered SVG rather than guessed. Pushed as `14e4065`.
+- 2026-09-04: Renamed `hermd` -> `txtwrght` project-wide (package, CLI
+  entrypoint, bindings `clau-dom`/`gem-dom` -> `claude`/`gemini`) and flattened
+  the workspace/engine split: this repo is now the repo root directly at
+  `~/development/txtwrght` (was nested as `her-dom/` under an un-versioned
+  `hermd/` wrapper). Reference clones moved to a sibling
+  `~/development/txtwrght-refs/`. GitHub repo renamed
+  `SingularityAI-Dev/hermd` -> `SingularityAI-Dev/txtwrght`. Global Claude
+  Code skill and `/txtwrght` slash command installed to match. 92 tests green
+  after the rebuild.
 - 2026-08-23: Repo consolidation and README rewrite. `claude` and `gemini`
   (each 1-2 commits, docs only) folded into this repo as `git subtree` merges,
   history preserved; the two standalone GitHub repos are now orphaned and
   pending deletion (needs a `delete_repo`-scoped token). This repo renamed
-  `herd` -> `txtwrght` on GitHub (typo fix) and pushed to
-  `SingularityAI-Dev/txtwrght`. `ARCHITECTURE.md`/`DEVELOPMENT_PLAN.md` at the
-  workspace root updated to match. `README.md` rewritten to a full
-  standard-reference format (badges, problem framing, three animated SVG
-  diagrams, honest browser-use comparison, status table), superseding the
-  shorter version shipped 2026-08-22.
+  `herd` -> `hermd` on GitHub (typo fix) and pushed to
+  `SingularityAI-Dev/hermd` (superseded by the `txtwrght` rename above).
+  `ARCHITECTURE.md`/`DEVELOPMENT_PLAN.md` at the workspace root updated to
+  match. `README.md` rewritten to a full standard-reference format (badges,
+  problem framing, three animated SVG diagrams, honest browser-use
+  comparison, status table), superseding the shorter version shipped
+  2026-08-22.
 - 2026-08-22: Two of three post-gate roadmap items closed. `README.md`
   shipped (install, three modes, iframe limitation, attribution chain).
   Second distillation proof: live run against

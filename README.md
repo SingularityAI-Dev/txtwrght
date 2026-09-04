@@ -13,7 +13,7 @@ Playwright drives a real Chromium, a DOM extractor serializes the live page to i
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 
-One repo: the engine (`src/txtwrght`) plus both runtime bindings (`claude/`, `gemini/`), folded together on 2026-08-23 because three repos for two `SKILL.md`/`GEMINI.md` files was ceremony the content never earned. See [`../ARCHITECTURE.md`](../ARCHITECTURE.md) for the split and [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) for how it got built.
+One repo: the engine (`src/txtwrght`) plus both runtime bindings (`claude/`, `gemini/`), folded together on 2026-08-23 because three repos for two `SKILL.md`/`GEMINI.md` files was ceremony the content never earned. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the split.
 
 <p align="center">
   <img src="docs/assets/hero-layers.svg" alt="txtwrght sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer." width="100%"/>
@@ -134,7 +134,7 @@ cp .env.example .env   # fill in an LLM endpoint (see below)
 
 ## Status
 
-All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with recorded traces and a pass rate rather than a demo anecdote, passed **10 of 10** on 2026-08-17 (bar was 8 of 10, 181,851 tokens, 173 seconds). 92 tests green. Full detail in [`STATUS.md`](STATUS.md), full history in [`CHANGELOG.md`](CHANGELOG.md).
+All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with recorded traces and a pass rate rather than a demo anecdote, passed **10 of 10** on 2026-08-17 (bar was 8 of 10, 181,851 tokens, 173 seconds). 92 tests green. Full history in [`CHANGELOG.md`](CHANGELOG.md).
 
 | | |
 |---|---|

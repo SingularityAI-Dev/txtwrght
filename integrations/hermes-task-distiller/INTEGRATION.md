@@ -3,8 +3,8 @@
 This directory is the Hermes "task-distiller" deliverable: a master skill plus watcher plugin
 that turns big, expensive agentic runs into verified Python scripts registered as skills. It
 originally sat in `claude/` as a zip; it was moved here on 16 July 2026 because it is
-Hermes-side tooling and because it is the direct design input for Phase 5 of
-`../../DEVELOPMENT_PLAN.md` (the distillation loop):
+Hermes-side tooling and because it is the direct design input for `txtwrght distill`
+(the distillation loop):
 
 - `txtwrght distill <trace.jsonl>` will follow this skill's record, reproduce, verify, stage,
   register pipeline, generating deterministic Playwright scripts from successful agent traces.

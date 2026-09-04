@@ -91,7 +91,7 @@ txtwrght distill traces/run-<id>.jsonl --verify
 ```
 
 <p align="center">
-  <img src="docs/assets/distill-flow.svg" alt="A recorded trace is distilled into a plain Playwright script, verified by replay, and staged for review — no model left in the runtime path." width="100%"/>
+  <img src="docs/assets/distill-flow.svg" alt="A recorded trace is distilled into a plain Playwright script, verified by replay, and staged for review, no model left in the runtime path." width="100%"/>
 </p>
 
 Selectors are rebuilt from element identity recorded *at action time* (id, name, aria-label, css path), never from the step-local indices, because indices die the moment the run that produced them ends. Passwords are scrubbed at trace time and come back as `os.environ` lookups in the generated script, never literals. Scripts stage for review and are never auto-registered; `--verify` replays before you trust it.

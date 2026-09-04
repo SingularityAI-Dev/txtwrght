@@ -1,16 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" width="1200" height="460" role="img" aria-label="A recorded trace is distilled into a plain Playwright script, verified by replay, and staged for review — no model left in the runtime path.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460" width="1200" height="460" role="img" aria-label="A recorded trace is distilled into a plain Playwright script, verified by replay, and staged for review, no model left in the runtime path.">
   <defs>
     <style>
-      .bg { fill: #0d1117; }
-      .node-purple { fill: #161b22; stroke: #7c6fe0; stroke-width: 2; }
-      .node-orange { fill: #161b22; stroke: #e07050; stroke-width: 2; }
-      .node-green { fill: #161b22; stroke: #2db88a; stroke-width: 2; }
-      .title { fill: #c9d1d9; font: 600 18px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.04em; }
-      .subtitle { fill: #8b949e; font: 400 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
-      .label { fill: #c9d1d9; font: 700 17px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.03em; }
-      .sub { fill: #8b949e; font: 400 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
-      .tag { fill: #8b949e; font: 600 10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.14em; }
-      .ok-label { fill: #2db88a; font: 700 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; letter-spacing: 0.05em; }
+      .bg { fill: #0b0e0d; }
+      .node-amber { fill: #141917; stroke: #e8a33d; stroke-width: 2; }
+      .node-clay { fill: #141917; stroke: #c9714e; stroke-width: 2; }
+      .node-sage { fill: #141917; stroke: #6fae7c; stroke-width: 2; }
+      .title { fill: #eae7dd; font: 600 18px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.04em; }
+      .subtitle { fill: #9a9d94; font: 400 13px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; }
+      .label { fill: #eae7dd; font: 700 17px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.03em; }
+      .sub { fill: #9a9d94; font: 400 11.5px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; }
+      .tag { fill: #9a9d94; font: 600 10px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.14em; }
+      .ok-label { fill: #6fae7c; font: 700 13px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.05em; }
     </style>
   </defs>
 
@@ -21,8 +21,8 @@
 
   <!-- Trace -->
   <g transform="translate(80,150)">
-    <rect class="node-purple" width="290" height="150" rx="12"/>
-    <text x="20" y="30" class="tag" fill="#7c6fe0">RECORDED RUN</text>
+    <rect class="node-amber" width="290" height="150" rx="12"/>
+    <text x="20" y="30" class="tag" fill="#e8a33d">RECORDED RUN</text>
     <text x="20" y="64" class="label">trace.jsonl</text>
     <text x="20" y="90" class="sub">every state, LLM output, action</text>
     <text x="20" y="108" class="sub">element identity captured at</text>
@@ -31,18 +31,18 @@
 
   <!-- Distill -->
   <g transform="translate(455,150)">
-    <rect class="node-orange" width="290" height="150" rx="12"/>
-    <text x="20" y="30" class="tag" fill="#e07050">txtwrght distill</text>
+    <rect class="node-clay" width="290" height="150" rx="12"/>
+    <text x="20" y="30" class="tag" fill="#c9714e">txtwrght distill</text>
     <text x="20" y="64" class="label">rebuild selectors</text>
-    <text x="20" y="90" class="sub">indices are dead by now —</text>
+    <text x="20" y="90" class="sub">indices are dead by now:</text>
     <text x="20" y="108" class="sub">selectors come from recorded</text>
     <text x="20" y="126" class="sub">identity, not step-local indices</text>
   </g>
 
   <!-- Script -->
   <g transform="translate(830,150)">
-    <rect class="node-green" width="290" height="150" rx="12"/>
-    <text x="20" y="30" class="tag" fill="#2db88a">STAGED SCRIPT</text>
+    <rect class="node-sage" width="290" height="150" rx="12"/>
+    <text x="20" y="30" class="tag" fill="#6fae7c">STAGED SCRIPT</text>
     <text x="20" y="64" class="label">plain Playwright</text>
     <text x="20" y="90" class="sub">zero model in the runtime path</text>
     <text x="20" y="108" class="sub">passwords → os.environ lookups</text>
@@ -51,26 +51,26 @@
 
   <!-- Edges -->
   <g fill="none" stroke-width="2">
-    <path d="M 370 225 L 455 225" stroke="#7c6fe0"/>
-    <path d="M 745 225 L 830 225" stroke="#e07050"/>
+    <path d="M 370 225 L 455 225" stroke="#e8a33d"/>
+    <path d="M 745 225 L 830 225" stroke="#c9714e"/>
   </g>
-  <circle r="6" fill="#7c6fe0">
+  <circle r="6" fill="#e8a33d">
     <animateMotion dur="2.4s" repeatCount="indefinite" path="M 370 225 L 455 225"/>
     <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" repeatCount="indefinite"/>
   </circle>
-  <circle r="6" fill="#e07050">
+  <circle r="6" fill="#c9714e" opacity="0">
     <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M 745 225 L 830 225"/>
     <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
   </circle>
 
   <!-- Verify loop under the script node -->
-  <g fill="none" stroke="#2db88a" stroke-width="1.8" stroke-dasharray="5 4">
+  <g fill="none" stroke="#6fae7c" stroke-width="1.8" stroke-dasharray="5 4">
     <path d="M 975 300 C 975 360, 830 360, 830 300">
       <animate attributeName="stroke-dashoffset" values="0;-36" dur="1.6s" repeatCount="indefinite"/>
     </path>
   </g>
-  <polygon points="828,298 822,308 834,308" fill="#2db88a"/>
+  <polygon points="828,298 822,308 834,308" fill="#6fae7c"/>
   <text x="902" y="378" text-anchor="middle" class="ok-label">--verify · replay it before you trust it</text>
 
-  <text x="600" y="430" text-anchor="middle" class="sub">staged, never auto-registered — a human reads it before it runs unattended</text>
+  <text x="600" y="430" text-anchor="middle" class="sub">staged, never auto-registered, a human reads it before it runs unattended</text>
 </svg>

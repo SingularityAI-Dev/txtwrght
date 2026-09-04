@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" width="1200" height="430" role="img" aria-label="txtWright: a headless browser agent that reads pages as text, not pixels, and a way to stop paying a model for the same click twice. 92 tests passing, 10 of 10 on the live smoke gate, MIT licensed, Python 3.11 and up. Beside it, a registration page serialized to indexed text: each interactive element on one line behind a bracketed index.">
+  <defs>
+    <style>
+      .bg { fill: #0b0e0d; }
+      .surface { fill: #141917; stroke: #2a322d; stroke-width: 1; }
+      .bar { fill: #1b211e; }
+      .rule { stroke: #232a26; stroke-width: 1; }
+      .eyebrow { fill: #e8a33d; font: 600 13px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.14em; }
+      .wordmark { fill: #eae7dd; font: 700 58px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: -0.01em; }
+      .tagline { fill: #eae7dd; font: 400 22px "Source Serif 4",Georgia,"Times New Roman",serif; }
+      .tagline-hi { fill: #e8a33d; font-weight: 600; }
+      .chip { fill: #9a9d94; font: 400 12px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.03em; }
+      .chip-num { fill: #eae7dd; font-weight: 600; }
+      .chip-num-ok { fill: #6fae7c; font-weight: 600; }
+      .chip-box { fill: #141917; stroke: #2a322d; stroke-width: 1; }
+      .chip-box-ok { fill: rgba(111,174,122,0.12); stroke: rgba(111,174,122,0.35); stroke-width: 1; }
+      .term-bar-label { fill: #686c64; font: 400 10px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing: 0.08em; }
+      .code { font: 400 11px "IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; fill: #9a9d94; }
+      .code-tag { fill: #eae7dd; }
+      .code-new { fill: #e8a33d; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1200" height="430"/>
+
+  <!-- Left column: eyebrow, wordmark, tagline, stat chips -->
+  <text x="60" y="66" class="eyebrow">TEXT-ONLY BROWSER AGENT</text>
+
+  <text x="60" y="150" class="wordmark">txtWright</text>
+  <rect x="380" y="106" width="29" height="45" fill="#e8a33d">
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.1s" repeatCount="indefinite"/>
+  </rect>
+
+  <text x="60" y="212" class="tagline">A headless browser agent that reads pages as text,</text>
+  <text x="60" y="245" class="tagline">not pixels, and a way to <tspan class="tagline-hi">stop paying a model for</tspan></text>
+  <text x="60" y="278" class="tagline tagline-hi">the same click twice.</text>
+
+  <!-- Stat chips -->
+  <g transform="translate(60,330)">
+    <rect class="chip-box-ok" width="147" height="30" rx="3"/>
+    <text x="13" y="20" class="chip"><tspan class="chip-num-ok">92</tspan> tests passing</text>
+  </g>
+  <g transform="translate(217,330)">
+    <rect class="chip-box-ok" width="200" height="30" rx="3"/>
+    <text x="13" y="20" class="chip"><tspan class="chip-num-ok">10 / 10</tspan> live smoke gate</text>
+  </g>
+  <g transform="translate(427,330)">
+    <rect class="chip-box" width="117" height="30" rx="3"/>
+    <text x="13" y="20" class="chip">MIT licensed</text>
+  </g>
+  <g transform="translate(60,372)">
+    <rect class="chip-box" width="117" height="30" rx="3"/>
+    <text x="13" y="20" class="chip">Python 3.11+</text>
+  </g>
+
+  <!-- Right column: the indexed page, which is the entire prompt -->
+  <g transform="translate(650,56)">
+    <rect class="surface" width="490" height="250" rx="7"/>
+    <path class="bar" d="M 0 7 A 7 7 0 0 1 7 0 L 483 0 A 7 7 0 0 1 490 7 L 490 32 L 0 32 Z"/>
+    <line class="rule" x1="0" y1="32" x2="490" y2="32"/>
+    <rect x="0" y="0" width="490" height="250" rx="7" fill="none" stroke="#2a322d" stroke-width="1"/>
+    <text x="16" y="21" class="term-bar-label">INDEXED PAGE: REGISTRATION.HTML</text>
+
+    <text x="16" y="60" class="code">[Start of page]</text>
+    <text x="16" y="78.5" class="code">Registration</text>
+    <text x="16" y="97" class="code"><tspan class="code-new">*[0]</tspan><tspan class="code-tag">&lt;label for=username&gt;</tspan>Username <tspan class="code-tag">/&gt;</tspan></text>
+    <text x="16" y="115.5" class="code"><tspan class="code-new">*[1]</tspan><tspan class="code-tag">&lt;input type=text name=username placeholder=Your username</tspan></text>
+    <text x="16" y="134" class="code"><tspan class="code-new">*[2]</tspan><tspan class="code-tag">&lt;label for=password&gt;</tspan>Password <tspan class="code-tag">/&gt;</tspan></text>
+    <text x="16" y="152.5" class="code"><tspan class="code-new">*[3]</tspan><tspan class="code-tag">&lt;input type=password placeholder=Your password /&gt;</tspan></text>
+    <text x="16" y="171" class="code"><tspan class="code-new">*[5]</tspan><tspan class="code-tag">&lt;select name=country&gt;</tspan>Choose one</text>
+    <text x="16" y="189.5" class="code">South Africa</text>
+    <text x="16" y="208" class="code">United Kingdom <tspan class="code-tag">/&gt;</tspan></text>
+    <text x="16" y="226.5" class="code"><tspan class="code-new">*[9]</tspan><tspan class="code-tag">&lt;button type=submit id=submit-btn&gt;</tspan>Register <tspan class="code-tag">/&gt;</tspan></text>
+  </g>
+</svg>

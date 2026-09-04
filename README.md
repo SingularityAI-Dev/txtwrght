@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/hero-banner.svg" alt="txtWright: a headless browser agent that reads pages as text, not pixels, and a way to stop paying a model for the same click twice. 92 tests passing, 10 of 10 on the live smoke gate, MIT licensed, Python 3.11 and up." width="100%"/>
+</p>
+
 # txtwrght
 
 **A headless, text-only browser agent, and a way to stop paying a model for the same click twice.**

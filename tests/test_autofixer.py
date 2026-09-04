@@ -7,7 +7,7 @@ import json
 
 import pytest
 
-from hermd.llm import ParseError, normalize_response
+from txtwrght.llm import ParseError, normalize_response
 
 
 def response_with_tool_call(name: str, arguments: str) -> dict:

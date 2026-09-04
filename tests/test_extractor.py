@@ -53,7 +53,7 @@ def test_first_snapshot_marks_all_new_then_settles(browser, fixture_url):
 
 
 def test_revealed_elements_marked_new(browser, fixture_url):
-    from hermd import tools
+    from txtwrght import tools
 
     browser.goto(fixture_url("form.html"))
     state = browser.snapshot()

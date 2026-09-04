@@ -32,7 +32,7 @@
   <!-- Distill -->
   <g transform="translate(455,150)">
     <rect class="node-orange" width="290" height="150" rx="12"/>
-    <text x="20" y="30" class="tag" fill="#e07050">hermd distill</text>
+    <text x="20" y="30" class="tag" fill="#e07050">txtwrght distill</text>
     <text x="20" y="64" class="label">rebuild selectors</text>
     <text x="20" y="90" class="sub">indices are dead by now —</text>
     <text x="20" y="108" class="sub">selectors come from recorded</text>

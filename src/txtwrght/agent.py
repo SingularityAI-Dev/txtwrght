@@ -17,17 +17,17 @@ from dataclasses import dataclass, field
 from importlib import resources
 from typing import Any
 
-from hermd import tools
-from hermd.browser import Browser
-from hermd.config import Config
-from hermd.llm import LLMClient, LLMError, LLMResult
-from hermd.logging import get_logger
-from hermd.trace import SCRUBBED, Trace
+from txtwrght import tools
+from txtwrght.browser import Browser
+from txtwrght.config import Config
+from txtwrght.llm import LLMClient, LLMError, LLMResult
+from txtwrght.logging import get_logger
+from txtwrght.trace import SCRUBBED, Trace
 
 log = get_logger(__name__)
 
 SYSTEM_PROMPT = (
-    resources.files("hermd.prompts").joinpath("system_prompt.md").read_text()
+    resources.files("txtwrght.prompts").joinpath("system_prompt.md").read_text()
 )
 
 @dataclass
@@ -175,7 +175,7 @@ class Agent:
             data=data,
             steps=steps,
             usage=self._usage,
-            # A run this long is worth replaying deterministically: hermd distill
+            # A run this long is worth replaying deterministically: txtwrght distill
             # turns this trace into a Playwright script.
             distill_candidate=success and steps >= self.config.distill_threshold,
         )
@@ -339,7 +339,7 @@ class Agent:
         try:
             return bool(
                 page.evaluate(
-                    "(i) => ((window.__hermd_selector_map || {})[i] || {}).type === 'password'",
+                    "(i) => ((window.__txtwrght_selector_map || {})[i] || {}).type === 'password'",
                     index,
                 )
             )

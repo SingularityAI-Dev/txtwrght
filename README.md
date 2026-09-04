@@ -1,18 +1,18 @@
-# hermd
+# txtwrght
 
 **A headless, text-only browser agent, and a way to stop paying a model for the same click twice.**
 
-Playwright drives a real Chromium, a DOM extractor serializes the live page to indexed text, and either a model or an outer agent picks one action per step. No screenshots. No vision model. And once a flow is proven, `hermd distill` turns the recorded run into a plain Playwright script with no model in it at all: pay once, replay for free.
+Playwright drives a real Chromium, a DOM extractor serializes the live page to indexed text, and either a model or an outer agent picks one action per step. No screenshots. No vision model. And once a flow is proven, `txtwrght distill` turns the recorded run into a plain Playwright script with no model in it at all: pay once, replay for free.
 
 [![Tests](https://img.shields.io/badge/tests-92%20passing-brightgreen)](CHANGELOG.md)
 [![Smoke gate](https://img.shields.io/badge/smoke%20gate-10%2F10-brightgreen)](smoke/RESULTS.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 
-One repo: the engine (`src/hermd`) plus both runtime bindings (`clau-dom/`, `gem-dom/`), folded together on 2026-08-23 because three repos for two `SKILL.md`/`GEMINI.md` files was ceremony the content never earned. See [`../ARCHITECTURE.md`](../ARCHITECTURE.md) for the split and [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) for how it got built.
+One repo: the engine (`src/txtwrght`) plus both runtime bindings (`claude/`, `gemini/`), folded together on 2026-08-23 because three repos for two `SKILL.md`/`GEMINI.md` files was ceremony the content never earned. See [`../ARCHITECTURE.md`](../ARCHITECTURE.md) for the split and [`../DEVELOPMENT_PLAN.md`](../DEVELOPMENT_PLAN.md) for how it got built.
 
 <p align="center">
-  <img src="docs/assets/hero-layers.svg" alt="hermd sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer." width="100%"/>
+  <img src="docs/assets/hero-layers.svg" alt="txtwrght sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer." width="100%"/>
 </p>
 
 ---
@@ -25,7 +25,7 @@ Browser agents that reason over raw HTML pay a different tax: a real page is tho
 
 And almost every agentic browser run repeats work it already solved. The same login flow, the same "click accept on the cookie banner," the same three-step checkout, driven by a model from scratch every time, at full agent-loop cost, because nothing captured what happened well enough to replay it without a model in the loop.
 
-**hermd's answer to all three:** extract only what's interactive and visible, serialize it to a flat indexed text view a model can read cheaply and act on precisely, and record every run well enough that a proven one never needs a model again.
+**txtwrght's answer to all three:** extract only what's interactive and visible, serialize it to a flat indexed text view a model can read cheaply and act on precisely, and record every run well enough that a proven one never needs a model again.
 
 ---
 
@@ -69,25 +69,25 @@ A step budget warning lands as a `<sys>` note at 5 and 2 steps remaining. A URL 
 **Autonomous.** The engine's own loop calls an LLM over any OpenAI-compatible endpoint.
 
 ```bash
-hermd run "log in with username tomsmith and password SuperSecretPassword!" \
+txtwrght run "log in with username tomsmith and password SuperSecretPassword!" \
   --url https://the-internet.herokuapp.com/login
 ```
 
 **Driven.** An outer agent — Claude Code, Gemini CLI, anything with a shell — is the loop. No second model. The browser stays alive between commands over a debugging port.
 
 ```bash
-hermd session start --url https://example.com
-hermd session snapshot
-hermd session act click 5
-hermd session end
+txtwrght session start --url https://example.com
+txtwrght session snapshot
+txtwrght session act click 5
+txtwrght session end
 ```
 
-`clau-dom/` ships the `SKILL.md` for this with Claude Code; `gem-dom/` ships the `GEMINI.md` equivalent. Both are thin glue over the same session CLI, on purpose: any logic they need belongs in the engine, not the binding.
+`claude/` ships the `SKILL.md` for this with Claude Code; `gemini/` ships the `GEMINI.md` equivalent. Both are thin glue over the same session CLI, on purpose: any logic they need belongs in the engine, not the binding.
 
 **Distilled.** Once a flow is proven, freeze it. No model, no agent loop, no retry logic at replay time, just a script.
 
 ```bash
-hermd distill traces/run-<id>.jsonl --verify
+txtwrght distill traces/run-<id>.jsonl --verify
 ```
 
 <p align="center">
@@ -102,22 +102,22 @@ Selectors are rebuilt from element identity recorded *at action time* (id, name,
 
 **Cross-origin iframes are out of scope.** The extractor descends into same-origin `contentDocument` (tested, works) but doesn't bridge cross-origin frame boundaries, which browsers block by design without a cooperating protocol on both sides. A task needing to act inside a cross-origin frame won't see into it.
 
-**No vision, ever, by design.** If a task genuinely needs to read pixels — a canvas chart with no accessible data, a CAPTCHA — hermd isn't the tool. It trades that capability for cheap, precise, auditable text-only reasoning on the far larger set of tasks that don't need it.
+**No vision, ever, by design.** If a task genuinely needs to read pixels — a canvas chart with no accessible data, a CAPTCHA — txtwrght isn't the tool. It trades that capability for cheap, precise, auditable text-only reasoning on the far larger set of tasks that don't need it.
 
 ---
 
 ## How this differs from browser-use
 
-[browser-use](https://github.com/browser-use/browser-use) popularized the pattern hermd builds on: index interactive elements, serialize to text, one action per LLM step. hermd owes it and [page-agent](https://github.com/alibaba/page-agent) (which ported and extended the pattern) direct credit; the extractor and serializer here are a Playwright-native port, not a from-scratch reinvention. Full attribution chain below.
+[browser-use](https://github.com/browser-use/browser-use) popularized the pattern txtwrght builds on: index interactive elements, serialize to text, one action per LLM step. txtwrght owes it and [page-agent](https://github.com/alibaba/page-agent) (which ported and extended the pattern) direct credit; the extractor and serializer here are a Playwright-native port, not a from-scratch reinvention. Full attribution chain below.
 
-The difference is what happens *after* a run succeeds. browser-use's unit of value is the agent step; hermd's is the distilled script. A login flow driven by browser-use costs an LLM call every single time it runs. The same flow through `hermd distill` costs an LLM call exactly once, and every replay after that is a Playwright script with a `--verify` gate and zero token spend. hermd is also runtime-agnostic in a specific sense browser-use isn't: the same engine serves an autonomous LLM loop, a driven outer-agent loop (Claude Code, Gemini CLI), and a distilled zero-model script from one shared extractor and tool set, rather than one agent-loop product.
+The difference is what happens *after* a run succeeds. browser-use's unit of value is the agent step; txtwrght's is the distilled script. A login flow driven by browser-use costs an LLM call every single time it runs. The same flow through `txtwrght distill` costs an LLM call exactly once, and every replay after that is a Playwright script with a `--verify` gate and zero token spend. txtwrght is also runtime-agnostic in a specific sense browser-use isn't: the same engine serves an autonomous LLM loop, a driven outer-agent loop (Claude Code, Gemini CLI), and a distilled zero-model script from one shared extractor and tool set, rather than one agent-loop product.
 
 ---
 
 ## Install
 
 ```bash
-cd her-dom
+cd txtwrght
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
@@ -136,8 +136,8 @@ All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with 
 |---|---|
 | Engine core | Extractor, serializer, tools, agent loop, tracing — done |
 | Hardening | Popups, dialogs, settle, same-origin iframes, structured logs — done |
-| `clau-dom` binding | Claude Code drives the session CLI, proven on a real login — done |
-| `gem-dom` binding | Gemini CLI equivalent, same shape — done |
+| `claude` binding | Claude Code drives the session CLI, proven on a real login — done |
+| `gemini` binding | Gemini CLI equivalent, same shape — done |
 | Distillation | Trace → script, replay-verified, two live proofs (a login, a redirect chain) — done |
 | Second-model gate | Same smoke suite on a non-Claude model, to isolate contract from prompt — deferred, no credential wired up yet |
 
@@ -145,7 +145,7 @@ All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with 
 
 ## Third-party attribution
 
-The DOM extractor (`src/hermd/dom/extractor.js`) and serializer (`src/hermd/dom/serializer.py`) are ported from [page-agent](https://github.com/alibaba/page-agent) (MIT), itself derived from [browser-use](https://github.com/browser-use/browser-use) (MIT, Copyright (c) 2024 Gregor Zunic). Full notice chain in [`LICENSE`](LICENSE).
+The DOM extractor (`src/txtwrght/dom/extractor.js`) and serializer (`src/txtwrght/dom/serializer.py`) are ported from [page-agent](https://github.com/alibaba/page-agent) (MIT), itself derived from [browser-use](https://github.com/browser-use/browser-use) (MIT, Copyright (c) 2024 Gregor Zunic). Full notice chain in [`LICENSE`](LICENSE).
 
 ---
 

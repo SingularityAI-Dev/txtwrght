@@ -10,10 +10,10 @@ import re
 
 import pytest
 
-from hermd.agent import Agent, ExecutionResult
-from hermd.config import Config
-from hermd.llm import LLMResult
-from hermd.trace import Trace
+from txtwrght.agent import Agent, ExecutionResult
+from txtwrght.config import Config
+from txtwrght.llm import LLMResult
+from txtwrght.trace import Trace
 
 
 class ScriptedLLM:

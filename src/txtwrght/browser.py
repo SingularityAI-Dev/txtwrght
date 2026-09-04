@@ -13,12 +13,12 @@ from importlib import resources
 from playwright.sync_api import Browser as PlaywrightBrowser
 from playwright.sync_api import BrowserContext, Dialog, Page, Playwright, sync_playwright
 
-from hermd.config import Config
-from hermd.dom.serializer import flat_tree_to_string
-from hermd.dom.state import BrowserState
-from hermd.logging import get_logger
+from txtwrght.config import Config
+from txtwrght.dom.serializer import flat_tree_to_string
+from txtwrght.dom.state import BrowserState
+from txtwrght.logging import get_logger
 
-_EXTRACTOR_JS = resources.files("hermd.dom").joinpath("extractor.js").read_text()
+_EXTRACTOR_JS = resources.files("txtwrght.dom").joinpath("extractor.js").read_text()
 
 log = get_logger(__name__)
 
@@ -223,10 +223,10 @@ class Browser:
 
         self.page.evaluate(_EXTRACTOR_JS)  # idempotent installer
         raw = self.page.evaluate(
-            "(cfg) => window.__hermd_extract(cfg)", {"viewportExpansion": ve}
+            "(cfg) => window.__txtwrght_extract(cfg)", {"viewportExpansion": ve}
         )
         selector_count = self.page.evaluate(
-            "() => Object.keys(window.__hermd_selector_map).length"
+            "() => Object.keys(window.__txtwrght_selector_map).length"
         )
 
         return BrowserState(

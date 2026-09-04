@@ -10,14 +10,14 @@ import json
 
 import pytest
 
-from hermd import session as sess
+from txtwrght import session as sess
 
 
 @pytest.fixture
 def live_session(tmp_path, monkeypatch, playwright_driver, page_server):
     """An isolated session rooted in tmp_path, always torn down."""
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HERMD_CHROMIUM", playwright_driver.chromium.executable_path)
+    monkeypatch.setenv("TXTWRGHT_CHROMIUM", playwright_driver.chromium.executable_path)
     # In the CLI every command is its own process and starts its own driver;
     # here the suite already owns one, so lend it.
     monkeypatch.setattr(sess, "_lent_driver", playwright_driver)

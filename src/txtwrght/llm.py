@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-from hermd.config import LLMEndpoint
+from txtwrght.config import LLMEndpoint
 
 PARSE_RETRIES = 2
 

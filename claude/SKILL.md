@@ -1,11 +1,11 @@
 ---
-name: clau-dom
+name: claude
 description: Drive a real browser as a text-only DOM, one step at a time, with Claude Code itself as the loop. Use when a task needs a live web page - filling a form, signing in, extracting data behind navigation, checking a deployed site, reproducing a UI bug - and a plain HTTP fetch is not enough because the page needs JavaScript, clicks, or session state. Not for reading static pages or documentation, where fetching the URL is cheaper.
 ---
 
-# clau-dom: you are the loop
+# claude: you are the loop
 
-`hermd` drives a headless Chromium and serializes the page to indexed text. No
+`txtwrght` drives a headless Chromium and serializes the page to indexed text. No
 screenshots, no second model. You snapshot, choose one action, act, and repeat.
 
 The browser lives between commands, so each command is one step of your own
@@ -14,10 +14,10 @@ reasoning. Nothing hands control to another agent.
 ## The loop
 
 ```bash
-hermd session start --url https://example.com   # opens the page, prints the view
-hermd session act click 12                      # acts, prints the new view
-hermd session act input 3 "geez"
-hermd session end                               # kills the browser, keeps the trace
+txtwrght session start --url https://example.com   # opens the page, prints the view
+txtwrght session act click 12                      # acts, prints the new view
+txtwrght session act input 3 "geez"
+txtwrght session end                               # kills the browser, keeps the trace
 ```
 
 Every `act` prints the page again afterwards, so the normal loop is one command
@@ -57,24 +57,24 @@ most recent output only.
 
 | Command | Does |
 |---|---|
-| `hermd session act click <n>` | Click element `n` |
-| `hermd session act input <n> "text"` | Type into element `n` |
-| `hermd session act select <n> "Option label"` | Choose a dropdown option by its visible label |
-| `hermd session act scroll [--up] [--pages 0.5] [--pixels 400] [--index n]` | Scroll the window, or the container at `n` |
-| `hermd session act scroll_horizontally [--left]` | Scroll sideways |
-| `hermd session act press Enter` | Press a key |
-| `hermd session act goto <url>` | Navigate |
-| `hermd session act wait 2` | Wait, for pages that answer slowly |
+| `txtwrght session act click <n>` | Click element `n` |
+| `txtwrght session act input <n> "text"` | Type into element `n` |
+| `txtwrght session act select <n> "Option label"` | Choose a dropdown option by its visible label |
+| `txtwrght session act scroll [--up] [--pages 0.5] [--pixels 400] [--index n]` | Scroll the window, or the container at `n` |
+| `txtwrght session act scroll_horizontally [--left]` | Scroll sideways |
+| `txtwrght session act press Enter` | Press a key |
+| `txtwrght session act goto <url>` | Navigate |
+| `txtwrght session act wait 2` | Wait, for pages that answer slowly |
 
 Inspecting and steering:
 
 | Command | Does |
 |---|---|
-| `hermd session snapshot` | Print the current view again |
-| `hermd session tabs` | List open tabs, `*` marks the active one |
-| `hermd session switch <i>` | Drive a different tab (`-1` is the newest) |
-| `hermd session status` | pid, port, steps taken, trace path |
-| `hermd session end` | Kill the browser, keep the trace |
+| `txtwrght session snapshot` | Print the current view again |
+| `txtwrght session tabs` | List open tabs, `*` marks the active one |
+| `txtwrght session switch <i>` | Drive a different tab (`-1` is the newest) |
+| `txtwrght session status` | pid, port, steps taken, trace path |
+| `txtwrght session end` | Kill the browser, keep the trace |
 
 ## Rules that keep runs cheap and honest
 
@@ -92,7 +92,7 @@ Inspecting and steering:
    the DOM to go quiet, but a page that answers after a timer still needs
    `act wait 1` before you judge it.
 6. **Always `end`.** The browser is a detached process; it outlives your session
-   until killed. `hermd session status` tells you if one is already running.
+   until killed. `txtwrght session status` tells you if one is already running.
 
 ## Secrets
 
@@ -117,9 +117,9 @@ state that only exists mid-session.
 ## Setup
 
 ```bash
-cd ../her-dom && .venv/bin/python -m hermd session start --url <url>
+cd ../txtwrght && .venv/bin/python -m txtwrght session start --url <url>
 ```
 
-Or install once (`pip install -e ../her-dom`) and call `hermd` directly. Config
-lives in `her-dom/.env`; only the `BROWSER_*`, `SETTLE_*` and `DIALOG_POLICY`
+Or install once (`pip install -e ../txtwrght`) and call `txtwrght` directly. Config
+lives in `txtwrght/.env`; only the `BROWSER_*`, `SETTLE_*` and `DIALOG_POLICY`
 settings matter here, since this mode uses no LLM endpoint at all.

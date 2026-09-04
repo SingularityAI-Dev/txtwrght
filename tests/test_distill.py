@@ -11,14 +11,14 @@ import sys
 
 import pytest
 
-from hermd import distill
-from hermd import session as sess
+from txtwrght import distill
+from txtwrght import session as sess
 
 
 @pytest.fixture
 def live_session(tmp_path, monkeypatch, playwright_driver, page_server):
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HERMD_CHROMIUM", playwright_driver.chromium.executable_path)
+    monkeypatch.setenv("TXTWRGHT_CHROMIUM", playwright_driver.chromium.executable_path)
     monkeypatch.setattr(sess, "_lent_driver", playwright_driver)
     sess.start(f"{page_server}/form.html", headless=True)
     yield
@@ -89,8 +89,8 @@ def test_scrubbed_values_become_env_lookups(tmp_path, live_session, page_server)
 
     assert "hunter2" not in source
     assert "***scrubbed***" not in source
-    assert 'os.environ["HERMD_SECRET_PASSWORD"]' in source
-    assert result["secrets"] == ["HERMD_SECRET_PASSWORD"]
+    assert 'os.environ["TXTWRGHT_SECRET_PASSWORD"]' in source
+    assert result["secrets"] == ["TXTWRGHT_SECRET_PASSWORD"]
 
 
 def test_verify_refuses_to_replay_a_script_needing_secrets(tmp_path, live_session, page_server):
@@ -101,7 +101,7 @@ def test_verify_refuses_to_replay_a_script_needing_secrets(tmp_path, live_sessio
         trace_path(tmp_path), out_dir=tmp_path / "distilled", verify=True
     )
     assert result["verified"] is None
-    assert "HERMD_SECRET_PASSWORD" in result["output"]
+    assert "TXTWRGHT_SECRET_PASSWORD" in result["output"]
 
 
 # -- the real proof -------------------------------------------------------

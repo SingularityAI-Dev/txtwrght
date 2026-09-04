@@ -1,6 +1,6 @@
-# gem-dom: drive a real page from Gemini CLI
+# gemini: drive a real page from Gemini CLI
 
-`hermd` runs a headless Chromium and serializes the page to indexed text. No
+`txtwrght` runs a headless Chromium and serializes the page to indexed text. No
 screenshots, no vision model. You snapshot, choose one action, act, repeat. The
 browser stays alive between commands, so each command is one step of your own
 reasoning.
@@ -12,10 +12,10 @@ fetch the URL instead: cheaper and faster.
 ## The loop
 
 ```bash
-hermd session start --url https://example.com   # opens the page, prints the view
-hermd session act click 12                      # acts, prints the new view
-hermd session act input 3 "geez"
-hermd session end                               # kills the browser, keeps the trace
+txtwrght session start --url https://example.com   # opens the page, prints the view
+txtwrght session act click 12                      # acts, prints the new view
+txtwrght session act input 3 "geez"
+txtwrght session end                               # kills the browser, keeps the trace
 ```
 
 Each `act` prints the page again, so one command is one step. Add `--quiet` to
@@ -48,16 +48,16 @@ most recent output.
 
 | Command | Does |
 |---|---|
-| `hermd session act click <n>` | Click element `n` |
-| `hermd session act input <n> "text"` | Type into element `n` |
-| `hermd session act select <n> "Option label"` | Pick a dropdown option by visible label |
-| `hermd session act scroll [--up] [--pages 0.5] [--index n]` | Scroll window or container |
-| `hermd session act press Enter` | Press a key |
-| `hermd session act goto <url>` | Navigate |
-| `hermd session act wait 2` | Wait for a slow page |
-| `hermd session snapshot` | Print the current view again |
-| `hermd session tabs` / `switch <i>` | List tabs, drive a different one |
-| `hermd session status` / `end` | Inspect, then shut the browser down |
+| `txtwrght session act click <n>` | Click element `n` |
+| `txtwrght session act input <n> "text"` | Type into element `n` |
+| `txtwrght session act select <n> "Option label"` | Pick a dropdown option by visible label |
+| `txtwrght session act scroll [--up] [--pages 0.5] [--index n]` | Scroll window or container |
+| `txtwrght session act press Enter` | Press a key |
+| `txtwrght session act goto <url>` | Navigate |
+| `txtwrght session act wait 2` | Wait for a slow page |
+| `txtwrght session snapshot` | Print the current view again |
+| `txtwrght session tabs` / `switch <i>` | List tabs, drive a different one |
+| `txtwrght session status` / `end` | Inspect, then shut the browser down |
 
 ## Rules
 
@@ -69,8 +69,8 @@ most recent output.
 
 ## The other mode: Gemini as the model behind the loop
 
-Nothing in this directory is needed for that. `hermd run` speaks to any
-OpenAI-compatible endpoint, and Gemini exposes one. Point `her-dom/.env` at it:
+Nothing in this directory is needed for that. `txtwrght run` speaks to any
+OpenAI-compatible endpoint, and Gemini exposes one. Point `txtwrght/.env` at it:
 
 ```bash
 LLM_1_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
@@ -78,27 +78,27 @@ LLM_1_API_KEY=<your key>
 LLM_1_MODEL=gemini-3.6-flash
 ```
 
-Then `hermd run "task" --url <url>` runs the observe, think, act loop internally
+Then `txtwrght run "task" --url <url>` runs the observe, think, act loop internally
 with Gemini choosing the actions, and writes the same JSONL trace.
 
 The two modes differ in where the judgment lives, not in what the engine does.
 Driving it yourself keeps your own memory and tools in the loop and spends no
-extra tokens on a second model; `hermd run` is what you want when the loop
+extra tokens on a second model; `txtwrght run` is what you want when the loop
 should run unattended.
 
 ## Traces and distillation
 
 Every session appends to `traces/run-<stamp>-session.jsonl`: page states, the
-actions taken, and the identity of each element acted on. `hermd distill
+actions taken, and the identity of each element acted on. `txtwrght distill
 <trace>` turns a successful run into a plain Playwright script, so a flow driven
 once by hand replays later with no model at all.
 
 ## Setup
 
 ```bash
-cd ../her-dom && pip install -e .          # or use its .venv directly
-hermd session start --url <url>
+cd ../txtwrght && pip install -e .          # or use its .venv directly
+txtwrght session start --url <url>
 ```
 
-Config lives in `her-dom/.env`. For this mode only the `BROWSER_*`, `SETTLE_*`
+Config lives in `txtwrght/.env`. For this mode only the `BROWSER_*`, `SETTLE_*`
 and `DIALOG_POLICY` settings matter: no LLM endpoint is used.

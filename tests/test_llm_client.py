@@ -8,8 +8,8 @@ import json
 import httpx
 import pytest
 
-from hermd.config import Config, LLMEndpoint
-from hermd.llm import LLMClient, LLMError
+from txtwrght.config import Config, LLMEndpoint
+from txtwrght.llm import LLMClient, LLMError
 
 
 def agent_output_response(action: dict) -> dict:

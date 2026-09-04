@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560" role="img" aria-label="hermd sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" width="1200" height="560" role="img" aria-label="txtwrght sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer.">
   <defs>
     <style>
       .bg { fill: #0d1117; }
@@ -23,7 +23,7 @@
 
   <rect class="bg" width="1200" height="560"/>
 
-  <text x="600" y="40" text-anchor="middle" class="title">hermd — THE TEXT-ONLY INTERFACE LAYER</text>
+  <text x="600" y="40" text-anchor="middle" class="title">txtwrght — THE TEXT-ONLY INTERFACE LAYER</text>
   <text x="600" y="62" text-anchor="middle" class="subtitle">headless · no screenshots · no multimodal model</text>
 
   <!-- Top: real browser -->
@@ -70,7 +70,7 @@
   <g transform="translate(70,398)">
     <rect class="panel" width="340" height="120" rx="10" stroke="#58a6ff" stroke-width="2"/>
     <text x="20" y="26" class="tag">AUTONOMOUS</text>
-    <text x="20" y="58" class="label-blue">hermd run</text>
+    <text x="20" y="58" class="label-blue">txtwrght run</text>
     <text x="20" y="80" class="muted">engine's own loop calls an LLM</text>
     <text x="20" y="98" class="muted">one action per step, max N steps</text>
   </g>
@@ -78,7 +78,7 @@
   <g transform="translate(430,398)">
     <rect class="panel" width="340" height="120" rx="10" stroke="#2db88a" stroke-width="2"/>
     <text x="20" y="26" class="tag">DRIVEN</text>
-    <text x="20" y="58" class="label-green">hermd session</text>
+    <text x="20" y="58" class="label-green">txtwrght session</text>
     <text x="20" y="80" class="muted">outer agent is the loop</text>
     <text x="20" y="98" class="muted">no second model in the path</text>
   </g>
@@ -86,7 +86,7 @@
   <g transform="translate(790,398)">
     <rect class="panel" width="340" height="120" rx="10" stroke="#e07050" stroke-width="2"/>
     <text x="20" y="26" class="tag">DISTILLED</text>
-    <text x="20" y="58" class="label-orange">hermd distill</text>
+    <text x="20" y="58" class="label-orange">txtwrght distill</text>
     <text x="20" y="80" class="muted">recorded run → Playwright script</text>
     <text x="20" y="98" class="muted">zero model at replay time</text>
   </g>

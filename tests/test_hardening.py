@@ -7,9 +7,9 @@ the driver, a slow page judged too early, content locked inside a frame.
 
 import pytest
 
-from hermd import tools
-from hermd.browser import Browser
-from hermd.config import Config
+from txtwrght import tools
+from txtwrght.browser import Browser
+from txtwrght.config import Config
 from tests.test_tools import find_index
 
 

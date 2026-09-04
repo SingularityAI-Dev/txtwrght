@@ -4,7 +4,7 @@ If any of these break, what the LLM sees has changed; that is a breaking change
 and must be deliberate.
 """
 
-from hermd.dom.serializer import flat_tree_to_string
+from txtwrght.dom.serializer import flat_tree_to_string
 
 
 def tree(root_children, extra_nodes=None):

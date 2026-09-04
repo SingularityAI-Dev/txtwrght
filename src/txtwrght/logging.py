@@ -1,7 +1,7 @@
 """structlog wiring.
 
 Quiet by default: the CLI owns stdout, so logs go to stderr and only at WARNING
-and above unless HERMD_LOG_LEVEL says otherwise (or --verbose bumps it to info).
+and above unless TXTWRGHT_LOG_LEVEL says otherwise (or --verbose bumps it to info).
 """
 
 from __future__ import annotations
@@ -26,11 +26,11 @@ def configure(level: str | None = None, json_logs: bool | None = None) -> None:
     """Configure structlog once per process. Safe to call repeatedly."""
     global _configured
 
-    name = (level or os.getenv("HERMD_LOG_LEVEL", "warning")).lower()
+    name = (level or os.getenv("TXTWRGHT_LOG_LEVEL", "warning")).lower()
     as_json = (
         json_logs
         if json_logs is not None
-        else os.getenv("HERMD_LOG_JSON", "false").lower() == "true"
+        else os.getenv("TXTWRGHT_LOG_JSON", "false").lower() == "true"
     )
     renderer = (
         structlog.processors.JSONRenderer()

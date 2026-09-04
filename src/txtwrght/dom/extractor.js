@@ -1,5 +1,5 @@
 /**
- * @file hermd DOM extractor, injected into the page via page.evaluate().
+ * @file txtwrght DOM extractor, injected into the page via page.evaluate().
  *
  * The domTree function below is ported from alibaba/page-agent
  * (packages/page-controller/src/dom/dom_tree/index.js, MIT), which is itself
@@ -9,16 +9,16 @@
  * @match page-agent copy of browser-use 0.5.9 d51b6e73daff7165fdd3e44debd667e7f5f7fdc5
  *
  * search @edit for lines page-agent changed relative to browser-use.
- * search @hermd for lines hermd changed relative to page-agent:
+ * search @txtwrght for lines txtwrght changed relative to page-agent:
  *
- * @hermd wrap as an installer IIFE instead of an ES module export; evaluating
- *        this file defines window.__hermd_extract(config).
- * @hermd live element refs cannot cross the page.evaluate JSON boundary, so
- *        __hermd_extract stores interactive refs in window.__hermd_selector_map
+ * @txtwrght wrap as an installer IIFE instead of an ES module export; evaluating
+ *        this file defines window.__txtwrght_extract(config).
+ * @txtwrght live element refs cannot cross the page.evaluate JSON boundary, so
+ *        __txtwrght_extract stores interactive refs in window.__txtwrght_selector_map
  *        (highlightIndex -> element) and strips `ref` from the returned tree.
- * @hermd isNew tracking (page-agent does it in getFlatTree with a WeakMap)
- *        moves into the wrapper using a persistent window.__hermd_seen WeakSet.
- * @hermd appended getPageInfo (port of page-controller getPageInfo.ts).
+ * @txtwrght isNew tracking (page-agent does it in getFlatTree with a WeakMap)
+ *        moves into the wrapper using a persistent window.__txtwrght_seen WeakSet.
+ * @txtwrght appended getPageInfo (port of page-controller getPageInfo.ts).
  */
 
 ;(() => {
@@ -1764,7 +1764,7 @@ const domTree = (
 }
 
 /**
- * @hermd port of page-agent packages/page-controller/src/dom/getPageInfo.ts
+ * @txtwrght port of page-agent packages/page-controller/src/dom/getPageInfo.ts
  */
 const getPageInfo = () => {
 	const viewport_width = window.innerWidth
@@ -1802,9 +1802,9 @@ const getPageInfo = () => {
 
 // Survives across snapshots on the same page; reset by navigation, same as
 // page-agent's newElementsCache. First snapshot marks everything new.
-window.__hermd_seen = window.__hermd_seen || new WeakSet()
+window.__txtwrght_seen = window.__txtwrght_seen || new WeakSet()
 
-window.__hermd_extract = (config = {}) => {
+window.__txtwrght_extract = (config = {}) => {
 	const flat = domTree({
 		doHighlightElements: false, // headless, text-only: never paint overlays
 		focusHighlightIndex: -1,
@@ -1821,15 +1821,15 @@ window.__hermd_extract = (config = {}) => {
 		const node = flat.map[id]
 		if (node.isInteractive && typeof node.highlightIndex === 'number' && node.ref) {
 			selectorMap[node.highlightIndex] = node.ref
-			if (!window.__hermd_seen.has(node.ref)) {
-				window.__hermd_seen.add(node.ref)
+			if (!window.__txtwrght_seen.has(node.ref)) {
+				window.__txtwrght_seen.add(node.ref)
 				node.isNew = true
 			}
 		}
 		// ref is a live element; it cannot serialize through page.evaluate
 		delete node.ref
 	}
-	window.__hermd_selector_map = selectorMap
+	window.__txtwrght_selector_map = selectorMap
 
 	return { tree: flat, pageInfo: getPageInfo() }
 }

@@ -2,7 +2,7 @@
 
 import re
 
-from hermd import tools
+from txtwrght import tools
 
 
 def find_index(content: str, needle: str) -> int:

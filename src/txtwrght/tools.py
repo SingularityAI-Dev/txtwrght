@@ -1,6 +1,6 @@
 """Actions against the current snapshot's selector map.
 
-Every function takes a live Playwright page whose window.__hermd_selector_map was
+Every function takes a live Playwright page whose window.__txtwrght_selector_map was
 populated by the most recent Browser.snapshot(). Indices are invalid after any
 action that changes the DOM; snapshot again before the next action.
 """
@@ -16,7 +16,7 @@ class ToolError(Exception):
 
 def _element_handle(page: Page, index: int) -> ElementHandle:
     handle = page.evaluate_handle(
-        "(i) => (window.__hermd_selector_map || {})[i]", index
+        "(i) => (window.__txtwrght_selector_map || {})[i]", index
     )
     element = handle.as_element()
     if element is None:
@@ -85,8 +85,8 @@ def describe_element(page: Page, index: int) -> dict:
 _WATCH_CLICK = """
 (el) => {
   const doc = el.ownerDocument;
-  doc.__hermdClickSeen = false;
-  doc.addEventListener('click', () => { doc.__hermdClickSeen = true; },
+  doc.__txtwrghtClickSeen = false;
+  doc.addEventListener('click', () => { doc.__txtwrghtClickSeen = true; },
     { capture: true, once: true });
 }
 """
@@ -112,7 +112,7 @@ def click_element_by_index(page: Page, index: int) -> None:
     # browser drops the synthesized event, leaving the page untouched and the
     # driver convinced it acted.
     try:
-        delivered = element.evaluate("(el) => el.ownerDocument.__hermdClickSeen === true")
+        delivered = element.evaluate("(el) => el.ownerDocument.__txtwrghtClickSeen === true")
     except Exception:
         return  # the context died with the click: it navigated, so it landed
     if not delivered:

@@ -30,11 +30,11 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from hermd.agent import Agent  # noqa: E402
-from hermd.browser import Browser  # noqa: E402
-from hermd.config import Config  # noqa: E402
-from hermd.llm import LLMClient, LLMError  # noqa: E402
-from hermd.trace import Trace  # noqa: E402
+from txtwrght.agent import Agent  # noqa: E402
+from txtwrght.browser import Browser  # noqa: E402
+from txtwrght.config import Config  # noqa: E402
+from txtwrght.llm import LLMClient, LLMError  # noqa: E402
+from txtwrght.trace import Trace  # noqa: E402
 
 TASKS = Path(__file__).parent / "tasks.yaml"
 PAGES = ROOT / "tests" / "pages"

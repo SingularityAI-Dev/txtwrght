@@ -1,12 +1,12 @@
 """Persistent browser sessions for per-step driving (Phase 3).
 
-`hermd run` keeps the browser inside one Python process. A driving agent like
+`txtwrght run` keeps the browser inside one Python process. A driving agent like
 Claude Code is not one process: it calls the CLI once per step. So the browser
 cannot be owned by any single command.
 
 Chromium is therefore launched detached, with a remote debugging port, and every
 command reconnects to it over CDP, does one thing, and disconnects. The browser
-outlives the CLI process; `hermd session end` is what kills it.
+outlives the CLI process; `txtwrght session end` is what kills it.
 
 Active tab rule: whichever tab the last command left you on, tracked by CDP
 target id. A popup or a `target=_blank` tab takes over automatically, since that
@@ -32,14 +32,14 @@ from typing import Any
 
 from playwright.sync_api import sync_playwright
 
-from hermd.browser import Browser
-from hermd.config import Config
-from hermd.logging import get_logger
-from hermd.trace import Trace, scrub_args
+from txtwrght.browser import Browser
+from txtwrght.config import Config
+from txtwrght.logging import get_logger
+from txtwrght.trace import Trace, scrub_args
 
 log = get_logger(__name__)
 
-SESSION_DIR = Path(os.getenv("HERMD_SESSION_DIR", ".hermd"))
+SESSION_DIR = Path(os.getenv("TXTWRGHT_SESSION_DIR", ".txtwrght"))
 SESSION_FILE = SESSION_DIR / "session.json"
 
 # One thread can host one sync Playwright driver. The CLI is a fresh process per
@@ -64,7 +64,7 @@ class SessionError(Exception):
 def _read_session() -> dict[str, Any]:
     if not SESSION_FILE.exists():
         raise SessionError(
-            "No active session. Start one with: hermd session start --url <url>"
+            "No active session. Start one with: txtwrght session start --url <url>"
         )
     return json.loads(SESSION_FILE.read_text())
 
@@ -90,9 +90,9 @@ def _free_port() -> int:
 
 
 def _chromium_executable() -> str:
-    # HERMD_CHROMIUM avoids spinning up a second Playwright driver just to ask
+    # TXTWRGHT_CHROMIUM avoids spinning up a second Playwright driver just to ask
     # where Chromium lives, which a thread already hosting one cannot do.
-    override = os.getenv("HERMD_CHROMIUM", "").strip()
+    override = os.getenv("TXTWRGHT_CHROMIUM", "").strip()
     if override:
         return override
     with sync_playwright() as p:
@@ -208,7 +208,7 @@ def connect() -> Connection:
     session = _read_session()
     if not _process_alive(session["pid"]):
         raise SessionError(
-            "The session's browser is gone. Clean up with: hermd session end"
+            "The session's browser is gone. Clean up with: txtwrght session end"
         )
 
     config = Config.from_env()
@@ -254,12 +254,12 @@ def start(url: str, headless: bool = True) -> dict[str, Any]:
         if _process_alive(existing["pid"]):
             raise SessionError(
                 f"A session is already running (pid {existing['pid']}). "
-                "End it first: hermd session end"
+                "End it first: txtwrght session end"
             )
 
     config = Config.from_env()
     port = _free_port()
-    profile = tempfile.mkdtemp(prefix="hermd-profile-")
+    profile = tempfile.mkdtemp(prefix="txtwrght-profile-")
     args = [
         _chromium_executable(),
         f"--remote-debugging-port={port}",
@@ -327,7 +327,7 @@ def act(action: str, args: dict[str, Any]) -> dict[str, Any]:
     The snapshot after the action is the point: indices are only valid for the
     snapshot they came from, so every act hands back fresh ones.
     """
-    from hermd import tools
+    from txtwrght import tools
 
     connection = connect()
     try:
@@ -370,7 +370,7 @@ def act(action: str, args: dict[str, Any]) -> dict[str, Any]:
 
 
 def _dispatch(browser: Browser, action: str, args: dict[str, Any]) -> str:
-    from hermd import tools
+    from txtwrght import tools
 
     page = browser.page
     if action == "click":

@@ -5,6 +5,6 @@ __pycache__/
 .env
 .DS_Store
 traces/
-.hermd/
+.txtwrght/
 distilled/
 smoke/results.json

@@ -7,8 +7,8 @@ import pytest
 
 from playwright.sync_api import sync_playwright
 
-from hermd.browser import Browser
-from hermd.config import Config
+from txtwrght.browser import Browser
+from txtwrght.config import Config
 
 PAGES = Path(__file__).parent / "pages"
 

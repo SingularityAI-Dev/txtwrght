@@ -24,8 +24,8 @@ SOFTWARE.
 
 Third-party notices
 
-The DOM extraction engine (src/hermd/dom/extractor.js) and the serialization
-format (src/hermd/dom/serializer.py) are ported from page-agent:
+The DOM extraction engine (src/txtwrght/dom/extractor.js) and the serialization
+format (src/txtwrght/dom/serializer.py) are ported from page-agent:
 
     page-agent <https://github.com/alibaba/page-agent>
     Licensed under the MIT License

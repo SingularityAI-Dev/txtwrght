@@ -1,4 +1,4 @@
-"""hermd CLI."""
+"""txtwrght CLI."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from pathlib import Path
 
 import click
 
-from hermd.browser import Browser
-from hermd.config import Config
-from hermd.logging import configure as configure_logging
+from txtwrght.browser import Browser
+from txtwrght.config import Config
+from txtwrght.logging import configure as configure_logging
 
 
 def resolve_url(url: str) -> str:
@@ -24,10 +24,10 @@ def resolve_url(url: str) -> str:
     "--log-level",
     type=click.Choice(["debug", "info", "warning", "error"]),
     default=None,
-    help="Structured logs to stderr. Default warning (HERMD_LOG_LEVEL).",
+    help="Structured logs to stderr. Default warning (TXTWRGHT_LOG_LEVEL).",
 )
 def main(log_level: str | None) -> None:
-    """hermd: CLI-first browser agent. Headless, text-only DOM, zero screenshots."""
+    """txtwrght: CLI-first browser agent. Headless, text-only DOM, zero screenshots."""
     configure_logging(log_level)
 
 
@@ -38,9 +38,9 @@ def main(log_level: str | None) -> None:
 @click.option("--verbose", is_flag=True, help="Stream reflection fields per step.")
 def run(task: str, url: str, max_steps: int | None, verbose: bool) -> None:
     """Run an agent task against a page. Writes a JSONL trace to traces/."""
-    from hermd.agent import Agent
-    from hermd.llm import LLMClient, LLMError
-    from hermd.trace import Trace
+    from txtwrght.agent import Agent
+    from txtwrght.llm import LLMClient, LLMError
+    from txtwrght.trace import Trace
 
     if verbose:
         configure_logging("info")
@@ -98,8 +98,8 @@ def distill(trace: str, out_dir: str, name: str | None, verify: bool) -> None:
     The script goes to a staging directory. Read it, replay it, and only then
     treat it as something you can schedule.
     """
-    from hermd.distill import DistillError
-    from hermd.distill import distill as distill_trace
+    from txtwrght.distill import DistillError
+    from txtwrght.distill import distill as distill_trace
 
     try:
         result = distill_trace(trace, out_dir=out_dir, name=name, verify=verify)
@@ -130,7 +130,7 @@ def session() -> None:
 
 
 def _session_call(fn, *args, **kwargs):
-    from hermd.session import SessionError
+    from txtwrght.session import SessionError
 
     try:
         return fn(*args, **kwargs)
@@ -143,7 +143,7 @@ def _session_call(fn, *args, **kwargs):
 @click.option("--headed", is_flag=True, help="Show the browser window.")
 def session_start(url: str, headed: bool) -> None:
     """Launch a browser that outlives this command, open URL, print the view."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     result = _session_call(sess.start, resolve_url(url), headless=not headed)
     click.echo(result["state"])
@@ -152,7 +152,7 @@ def session_start(url: str, headed: bool) -> None:
 @session.command("snapshot")
 def session_snapshot() -> None:
     """Print the current indexed text view. Indices are valid until you act."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     click.echo(_session_call(sess.snapshot))
 
@@ -183,15 +183,15 @@ def session_act(
     """Perform one action, then print the resulting page view.
 
     \b
-    hermd session act click 12
-    hermd session act input 3 "geez"
-    hermd session act select 7 "South Africa"
-    hermd session act scroll --up --pages 0.5
-    hermd session act press Enter
-    hermd session act goto https://example.com
-    hermd session act wait 2
+    txtwrght session act click 12
+    txtwrght session act input 3 "geez"
+    txtwrght session act select 7 "South Africa"
+    txtwrght session act scroll --up --pages 0.5
+    txtwrght session act press Enter
+    txtwrght session act goto https://example.com
+    txtwrght session act wait 2
     """
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     args: dict[str, object] = {}
     if action in ("click", "input", "select"):
@@ -229,7 +229,7 @@ def session_act(
 @session.command("tabs")
 def session_tabs() -> None:
     """List open tabs in the order this session first saw them."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     for tab in _session_call(sess.tabs):
         marker = "*" if tab["active"] else " "
@@ -240,7 +240,7 @@ def session_tabs() -> None:
 @click.argument("index", type=int)
 def session_switch(index: int) -> None:
     """Make tab INDEX the active tab (-1 is the newest)."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     click.echo(f"Active tab -> {_session_call(sess.switch, index)}")
 
@@ -248,7 +248,7 @@ def session_switch(index: int) -> None:
 @session.command("status")
 def session_status() -> None:
     """Show the running session: pid, port, steps taken, trace path."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     info = _session_call(sess.status)
     for key in ("pid", "port", "alive", "step", "headless", "trace"):
@@ -258,7 +258,7 @@ def session_status() -> None:
 @session.command("end")
 def session_end() -> None:
     """Kill the session browser and keep the trace."""
-    from hermd import session as sess
+    from txtwrght import session as sess
 
     info = _session_call(sess.end)
     click.echo(f"Session ended after {info['steps']} action(s). Trace: {info['trace']}")

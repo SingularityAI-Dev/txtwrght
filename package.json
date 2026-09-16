@@ -1,0 +1,14 @@
+{
+  "name": "txtwrght-dom-payloads",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node test harness for the JavaScript txtwrght injects into pages (src/txtwrght/dom/*.js). Not a published package; the shipped artifact is the Python wheel.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test \"tests/js/**/*.test.mjs\""
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5"
+  }
+}

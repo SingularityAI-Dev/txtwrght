@@ -8,40 +8,16 @@ after an action.
 
 from __future__ import annotations
 
-from importlib import resources
-
 from playwright.sync_api import Browser as PlaywrightBrowser
 from playwright.sync_api import BrowserContext, Dialog, Page, Playwright, sync_playwright
 
 from txtwrght.config import Config
+from txtwrght.dom import js
 from txtwrght.dom.serializer import flat_tree_to_string
 from txtwrght.dom.state import BrowserState
 from txtwrght.logging import get_logger
 
-_EXTRACTOR_JS = resources.files("txtwrght.dom").joinpath("extractor.js").read_text()
-
 log = get_logger(__name__)
-
-_DOM_QUIET_JS = """
-(cfg) => new Promise((resolve) => {
-  let last = performance.now();
-  const started = last;
-  const observer = new MutationObserver(() => { last = performance.now(); });
-  observer.observe(document.documentElement, {
-    subtree: true, childList: true, attributes: true, characterData: true,
-  });
-  const tick = () => {
-    const now = performance.now();
-    if (now - last >= cfg.quietMs || now - started >= cfg.capMs) {
-      observer.disconnect();
-      resolve(Math.round(now - started));
-    } else {
-      setTimeout(tick, 25);
-    }
-  };
-  setTimeout(tick, 25);
-})
-"""
 
 
 class Browser:
@@ -205,8 +181,10 @@ class Browser:
         if page is None or page.is_closed() or quiet_ms <= 0:
             return
         try:
+            js.install(page, js.SETTLE)
             page.evaluate(
-                _DOM_QUIET_JS, {"quietMs": quiet_ms, "capMs": self.config.settle_timeout_ms}
+                "(cfg) => window.__txtwrght_settle.domQuiet(cfg)",
+                {"quietMs": quiet_ms, "capMs": self.config.settle_timeout_ms},
             )
         except Exception:
             pass  # navigated mid-wait, or the context went away: not fatal
@@ -221,12 +199,13 @@ class Browser:
         assert self.page is not None, "Browser not started"
         ve = self.config.viewport_expansion if viewport_expansion is None else viewport_expansion
 
-        self.page.evaluate(_EXTRACTOR_JS)  # idempotent installer
+        js.install(self.page, js.EXTRACTOR)
         raw = self.page.evaluate(
             "(cfg) => window.__txtwrght_extract(cfg)", {"viewportExpansion": ve}
         )
+        js.install(self.page, js.ACTIONS)
         selector_count = self.page.evaluate(
-            "() => Object.keys(window.__txtwrght_selector_map).length"
+            "() => window.__txtwrght_actions.selectorCount()"
         )
 
         return BrowserState(

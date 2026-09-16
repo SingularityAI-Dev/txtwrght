@@ -169,3 +169,29 @@ def test_describe_element_unknown_index_is_empty(fresh_browser, page_server):
     fresh_browser.goto(f"{page_server}/login.html")
     fresh_browser.snapshot()
     assert tools.describe_element(fresh_browser.page, 999) == {}
+
+
+def test_describe_omits_frame_url_in_the_main_frame(fresh_browser, page_server):
+    """A main-frame element must not be labelled as living in a child document.
+
+    Needs a real browser: the Node harness in tests/js gives evaluated code a
+    global `window` that is not `document.defaultView`, so this branch of
+    describe is only observable here.
+    """
+    fresh_browser.goto(f"{page_server}/iframe.html")
+    state = fresh_browser.snapshot()
+    described = tools.describe_element(
+        fresh_browser.page, find_index(state.content, "Outer button")
+    )
+    assert described["text"] == "Outer button"
+    assert "frame_url" not in described
+
+
+def test_describe_records_frame_url_for_iframe_content(fresh_browser, page_server):
+    """Indices come from one flat map, so distillation needs the frame recorded."""
+    fresh_browser.goto(f"{page_server}/iframe.html")
+    state = fresh_browser.snapshot()
+    described = tools.describe_element(
+        fresh_browser.page, find_index(state.content, "Inner button")
+    )
+    assert described["frame_url"].endswith("/iframe-child.html")

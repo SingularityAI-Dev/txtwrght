@@ -20,6 +20,7 @@ from typing import Any
 from txtwrght import tools
 from txtwrght.browser import Browser
 from txtwrght.config import Config
+from txtwrght.dom import js
 from txtwrght.llm import LLMClient, LLMError, LLMResult
 from txtwrght.logging import get_logger
 from txtwrght.trace import SCRUBBED, Trace
@@ -337,10 +338,10 @@ class Agent:
         page = self.browser.page
         assert page is not None
         try:
+            js.install(page, js.ACTIONS)
             return bool(
                 page.evaluate(
-                    "(i) => ((window.__txtwrght_selector_map || {})[i] || {}).type === 'password'",
-                    index,
+                    "(i) => window.__txtwrght_actions.isPasswordInput(i)", index
                 )
             )
         except Exception:

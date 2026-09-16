@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/hero-banner.svg" alt="txtWright: a headless browser agent that reads pages as text, not pixels, and a way to stop paying a model for the same click twice. 92 tests passing, 10 of 10 on the live smoke gate, MIT licensed, Python 3.11 and up." width="100%"/>
+  <img src="docs/assets/hero-banner.svg" alt="txtWright: a headless browser agent that reads pages as text, not pixels, and a way to stop paying a model for the same click twice. 140 tests passing, 10 of 10 on the live smoke gate, MIT licensed, Python 3.11 and up." width="100%"/>
 </p>
 
 # txtwrght
@@ -8,7 +8,7 @@
 
 Playwright drives a real Chromium, a DOM extractor serializes the live page to indexed text, and either a model or an outer agent picks one action per step. No screenshots. No vision model. And once a flow is proven, `txtwrght distill` turns the recorded run into a plain Playwright script with no model in it at all: pay once, replay for free.
 
-[![Tests](https://img.shields.io/badge/tests-92%20passing-brightgreen)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/tests-94%20python%20%2B%2046%20node-brightgreen)](CHANGELOG.md)
 [![Smoke gate](https://img.shields.io/badge/smoke%20gate-10%2F10-brightgreen)](smoke/RESULTS.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
@@ -134,7 +134,7 @@ cp .env.example .env   # fill in an LLM endpoint (see below)
 
 ## Status
 
-All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with recorded traces and a pass rate rather than a demo anecdote, passed **10 of 10** on 2026-08-17 (bar was 8 of 10, 181,851 tokens, 173 seconds). 92 tests green. Full history in [`CHANGELOG.md`](CHANGELOG.md).
+All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with recorded traces and a pass rate rather than a demo anecdote, passed **10 of 10** on 2026-08-17 (bar was 8 of 10, 181,851 tokens, 173 seconds). 94 Python tests and 46 Node tests green. Full history in [`CHANGELOG.md`](CHANGELOG.md).
 
 | | |
 |---|---|
@@ -147,6 +147,22 @@ All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with 
 
 ---
 
+## Where the injected JavaScript lives
+
+Everything txtwrght runs inside the page is a file under [`src/txtwrght/dom/`](src/txtwrght/dom), never a string constant in Python.
+
+| File | Installs | Called by |
+|---|---|---|
+| `extractor.js` | `window.__txtwrght_extract` | every snapshot |
+| `actions.js` | `window.__txtwrght_actions` | the action verbs in `tools.py`, the trace scrubber in `agent.py` |
+| `settle.js` | `window.__txtwrght_settle` | the DOM-quiet wait in `browser.py` |
+
+Evaluating one of these files assigns a registry onto `window`; Python then calls into that registry by name and passes arguments, rather than shipping a function body per call. Assignment is idempotent, so a caller re-installs instead of tracking whether a navigation wiped the previous document.
+
+Two things fall out of that shape. A Chrome MV3 extension may not evaluate source text it received over a wire, so a payload that is ever going to be shared with an extension driver has to already exist as a file a content script can load — that is the constraint driving the layout. And JavaScript in a `.js` file can be loaded straight into Node, which is what the second test suite below does.
+
+---
+
 ## Third-party attribution
 
 The DOM extractor (`src/txtwrght/dom/extractor.js`) and serializer (`src/txtwrght/dom/serializer.py`) are ported from [page-agent](https://github.com/alibaba/page-agent) (MIT), itself derived from [browser-use](https://github.com/browser-use/browser-use) (MIT, Copyright (c) 2024 Gregor Zunic). Full notice chain in [`LICENSE`](LICENSE).
@@ -156,8 +172,13 @@ The DOM extractor (`src/txtwrght/dom/extractor.js`) and serializer (`src/txtwrgh
 ## Tests
 
 ```bash
-pytest                       # 92 tests: extractor, serializer, tools, distill
+pytest                       # 94 tests against a real Chromium: extractor, serializer, tools, distill
+npm ci && npm test           # 46 tests against happy-dom: the injected payloads, no browser
 python smoke/run_smoke.py    # the live 10-task exit gate, needs a working LLM endpoint
 ```
 
-Extractor and serializer behavior is pinned by golden tests over local fixtures; the serialized-page format is the prompt contract, and changing it is a breaking change that has to be deliberate.
+Two suites, because they can prove different things.
+
+**Python, against real Chromium.** The only place layout, hit-testing, popups and cross-frame behaviour are real. Extractor and serializer behaviour is pinned here by golden tests over local fixtures; the serialized-page format is the prompt contract, and changing it is a breaking change that has to be deliberate.
+
+**Node, against [happy-dom](https://github.com/capricorn86/happy-dom).** Loads the same `dom/*.js` files a browser would and calls into them directly: click-delivery verification, the css-path builder that distillation rebuilds selectors from, scroll arithmetic, and the mutation-quiet wait. Roughly two seconds, no browser to launch, so it is cheap enough to run on every edit. happy-dom has no layout engine and the extractor decides what is interactive from geometry, so `extractor.js` is deliberately only load-tested there and keeps its real coverage in the Python suite.

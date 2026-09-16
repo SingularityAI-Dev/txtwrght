@@ -3,11 +3,19 @@
 Every function takes a live Playwright page whose window.__txtwrght_selector_map was
 populated by the most recent Browser.snapshot(). Indices are invalid after any
 action that changes the DOM; snapshot again before the next action.
+
+The JavaScript half of each verb lives in `dom/actions.js`, installed here as
+`window.__txtwrght_actions`; see `dom/js.py` for why it is a file rather than a
+string constant. What is left in this module is the Playwright half: element
+addressing, timeouts, and the fallback ladder each verb walks when the first
+attempt does not land.
 """
 
 from __future__ import annotations
 
 from playwright.sync_api import ElementHandle, Page
+
+from txtwrght.dom import js
 
 
 class ToolError(Exception):
@@ -15,9 +23,8 @@ class ToolError(Exception):
 
 
 def _element_handle(page: Page, index: int) -> ElementHandle:
-    handle = page.evaluate_handle(
-        "(i) => (window.__txtwrght_selector_map || {})[i]", index
-    )
+    js.install(page, js.ACTIONS)
+    handle = page.evaluate_handle("(i) => window.__txtwrght_actions.lookup(i)", index)
     element = handle.as_element()
     if element is None:
         raise ToolError(
@@ -25,44 +32,6 @@ def _element_handle(page: Page, index: int) -> ElementHandle:
             "Snapshot again to get fresh indices."
         )
     return element
-
-
-_DESCRIBE_JS = """
-(el) => {
-  const attr = (n) => el.getAttribute(n) || undefined;
-  const cssPath = (node) => {
-    const parts = [];
-    while (node && node.nodeType === 1 && parts.length < 8) {
-      if (node.id) { parts.unshift('#' + CSS.escape(node.id)); break; }
-      const tag = node.tagName.toLowerCase();
-      const parent = node.parentElement;
-      if (!parent) { parts.unshift(tag); break; }
-      const sameTag = [...parent.children].filter((c) => c.tagName === node.tagName);
-      parts.unshift(sameTag.length > 1
-        ? tag + ':nth-of-type(' + (sameTag.indexOf(node) + 1) + ')'
-        : tag);
-      node = parent;
-    }
-    return parts.join(' > ');
-  };
-  return {
-    tag: el.tagName.toLowerCase(),
-    id: el.id || undefined,
-    name: attr('name'),
-    type: attr('type'),
-    role: attr('role'),
-    placeholder: attr('placeholder'),
-    aria_label: attr('aria-label'),
-    href: attr('href'),
-    value_attr: attr('value'),
-    text: (el.innerText || el.textContent || '').trim().slice(0, 80) || undefined,
-    css: cssPath(el),
-    frame_url: el.ownerDocument?.defaultView !== window
-      ? el.ownerDocument?.location?.href
-      : undefined,
-  };
-}
-"""
 
 
 def describe_element(page: Page, index: int) -> dict:
@@ -76,26 +45,16 @@ def describe_element(page: Page, index: int) -> dict:
     except ToolError:
         return {}
     try:
-        described = element.evaluate(_DESCRIBE_JS)
+        described = element.evaluate("(el) => window.__txtwrght_actions.describe(el)")
     except Exception:
         return {}
     return {k: v for k, v in described.items() if v is not None}
 
 
-_WATCH_CLICK = """
-(el) => {
-  const doc = el.ownerDocument;
-  doc.__txtwrghtClickSeen = false;
-  doc.addEventListener('click', () => { doc.__txtwrghtClickSeen = true; },
-    { capture: true, once: true });
-}
-"""
-
-
 def click_element_by_index(page: Page, index: int) -> None:
     element = _element_handle(page, index)
     try:
-        element.evaluate(_WATCH_CLICK)
+        element.evaluate("(el) => window.__txtwrght_actions.watchClick(el)")
     except Exception:
         pass
 
@@ -104,7 +63,7 @@ def click_element_by_index(page: Page, index: int) -> None:
     except Exception:
         # Overlay interception or off-screen geometry: dispatch in-page,
         # which is what page-agent itself does.
-        element.evaluate("(el) => el.click()")
+        element.evaluate("(el) => window.__txtwrght_actions.click(el)")
         return
 
     # A reported click is not a delivered click. Over connect_over_cdp (which is
@@ -112,11 +71,11 @@ def click_element_by_index(page: Page, index: int) -> None:
     # browser drops the synthesized event, leaving the page untouched and the
     # driver convinced it acted.
     try:
-        delivered = element.evaluate("(el) => el.ownerDocument.__txtwrghtClickSeen === true")
+        delivered = element.evaluate("(el) => window.__txtwrght_actions.clickSeen(el)")
     except Exception:
         return  # the context died with the click: it navigated, so it landed
     if not delivered:
-        element.evaluate("(el) => el.click()")
+        element.evaluate("(el) => window.__txtwrght_actions.click(el)")
 
 
 def input_text(page: Page, index: int, text: str) -> None:
@@ -142,17 +101,15 @@ def scroll(
 ) -> None:
     """Scroll the window, or the scrollable container at `index`."""
     sign = 1 if down else -1
+    args = {"sign": sign, "pixels": pixels, "numPages": num_pages}
     if index is not None:
         element = _element_handle(page, index)
         element.evaluate(
-            "(el, args) => { el.scrollBy(0, args.sign * (args.pixels ?? el.clientHeight * args.numPages)) }",
-            {"sign": sign, "pixels": pixels, "numPages": num_pages},
+            "(el, args) => window.__txtwrght_actions.scrollElement(el, args)", args
         )
     else:
-        page.evaluate(
-            "(args) => { window.scrollBy(0, args.sign * (args.pixels ?? window.innerHeight * args.numPages)) }",
-            {"sign": sign, "pixels": pixels, "numPages": num_pages},
-        )
+        js.install(page, js.ACTIONS)
+        page.evaluate("(args) => window.__txtwrght_actions.scrollWindow(args)", args)
 
 
 def scroll_horizontally(
@@ -162,14 +119,15 @@ def scroll_horizontally(
     index: int | None = None,
 ) -> None:
     sign = 1 if right else -1
+    args = {"sign": sign, "pixels": pixels}
     if index is not None:
         element = _element_handle(page, index)
         element.evaluate(
-            "(el, args) => { el.scrollBy(args.sign * (args.pixels ?? el.clientWidth / 2), 0) }",
-            {"sign": sign, "pixels": pixels},
+            "(el, args) => window.__txtwrght_actions.scrollElementHorizontally(el, args)",
+            args,
         )
     else:
+        js.install(page, js.ACTIONS)
         page.evaluate(
-            "(args) => { window.scrollBy(args.sign * (args.pixels ?? window.innerWidth / 2), 0) }",
-            {"sign": sign, "pixels": pixels},
+            "(args) => window.__txtwrght_actions.scrollWindowHorizontally(args)", args
         )

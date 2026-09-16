@@ -1,4 +1,5 @@
 .venv/
+node_modules/
 __pycache__/
 .pytest_cache/
 *.egg-info/
@@ -9,7 +10,9 @@ traces/
 distilled/
 smoke/results.json
 /DEVELOPMENT_PLAN.md
+/DEVELOPMENT_PLAN_V2.md
 /HANDOVER.md
 /NEXT_SESSION_PROMPT.md
 /STATUS.md
 /CONSOLE_CAPTURE_PROMPT.md
+/GATES.md

@@ -14,10 +14,17 @@ txtwrght/                   <- one git repo, github.com/SingularityAI-Dev/txtwrg
 └── tests/                  <- Python suite (Chromium) and tests/js (happy-dom)
 ```
 
-Interactive diagram, pinned to source lines:
-[`docs/architecture/txtwrght.architecture.html`](docs/architecture/txtwrght.architecture.html),
-generated with archify from
-[`txtwrght.architecture.json`](docs/architecture/txtwrght.architecture.json).
+<p align="center">
+  <a href="docs/architecture/txtwrght.architecture.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/architecture-dark.png"/>
+      <img src="docs/architecture/architecture-light.png" alt="txtwrght architecture: Claude Code drives the session CLI and the agent loop asks an LLM endpoint for one action; both act through Browser + tools, which calls the three in-page payloads extractor.js, actions.js and settle.js in Chromium. The serializer turns the flat tree into indexed text; runs record to trace.jsonl, which txtwrght distill turns into a staged Playwright script that replays against Chromium." width="100%"/>
+    </picture>
+  </a>
+</p>
+
+<sub>Interactive version: [`txtwrght.architecture.html`](docs/architecture/txtwrght.architecture.html), generated with archify from [`txtwrght.architecture.json`](docs/architecture/txtwrght.architecture.json).</sub>
+
 Reference clones (page-agent, space-agent) live outside the repo in
 `~/development/txtwrght-refs/`.
 
@@ -38,12 +45,36 @@ push it down into `txtwrght`'s `src/txtwrght/`.
    Code, Hermes) is the loop. No second LLM; the driving agent keeps
    its own judgment, memory, and tools.
 
+Both modes run the same loop; only who decides changes:
+
+<p align="center">
+  <a href="docs/architecture/observe-act-loop.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/loop-dark.png"/>
+      <img src="docs/architecture/loop-light.png" alt="Observe, think, act: snapshot() evaluates extractor.js in the page, the serializer turns its flat tree into indexed text, a model or outer agent decides one action, tools.py runs it through actions.js, settle.js waits for the DOM to go quiet, and the loop re-indexes. done or fail ends it." width="100%"/>
+    </picture>
+  </a>
+</p>
+
+<sub>Interactive version: [`observe-act-loop.html`](docs/architecture/observe-act-loop.html), generated with archify from [`observe-act-loop.workflow.json`](docs/architecture/observe-act-loop.workflow.json).</sub>
+
 3. **Distilled**: `txtwrght distill <trace.jsonl>`: a run that worked becomes a
    plain Playwright script with no model in it at all. This is the composition
    that makes the workspace more than a browser-use clone: pay a model once to
    discover a flow, replay it for free afterwards. Selectors are rebuilt from
    the element identity the trace recorded at action time, since indices mean
    nothing after the run that produced them.
+
+<p align="center">
+  <a href="docs/architecture/distill.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/distill-dark.png"/>
+      <img src="docs/architecture/distill-light.png" alt="Distill: actions.js records element identity at action time into trace.jsonl; txtwrght distill parses the run, rebuilds selectors from id, name, aria-label and css path, writes a plain Playwright script, and --verify replays it with secrets read from os.environ and no model." width="100%"/>
+    </picture>
+  </a>
+</p>
+
+<sub>Interactive version: [`distill.html`](docs/architecture/distill.html), generated with archify from [`distill.dataflow.json`](docs/architecture/distill.dataflow.json).</sub>
 
 ## The contract worth protecting
 

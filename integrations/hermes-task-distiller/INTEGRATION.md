@@ -6,6 +6,18 @@ originally sat in `claude/` as a zip; it was moved here on 16 July 2026 because 
 Hermes-side tooling and because it is the direct design input for `txtwrght distill`
 (the distillation loop):
 
+<p align="center">
+  <a href="../../docs/architecture/distill.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="../../docs/architecture/distill-dark.png"/>
+      <img src="../../docs/architecture/distill-light.png" alt="Distill: actions.js records element identity at action time into trace.jsonl; txtwrght distill parses the run, rebuilds selectors from id, name, aria-label and css path, writes a plain Playwright script, and --verify replays it with secrets read from os.environ and no model." width="100%"/>
+    </picture>
+  </a>
+</p>
+
+<sub>Interactive version: [`distill.html`](../../docs/architecture/distill.html), generated with archify from [`distill.dataflow.json`](../../docs/architecture/distill.dataflow.json).</sub>
+
+
 - `txtwrght distill <trace.jsonl>` will follow this skill's record, reproduce, verify, stage,
   register pipeline, generating deterministic Playwright scripts from successful agent traces.
 - The watcher plugin's threshold pattern (tool calls, external hits, wall clock) maps to

@@ -1,0 +1,255 @@
+{
+ "schema_version": 2,
+ "diagram_type": "workflow",
+ "meta": {
+  "title": "Observe, think, act",
+  "locale": "en",
+  "quality_profile": "showcase",
+  "views": [
+   {
+    "id": "observe",
+    "label": "Observe",
+    "focus": [
+     "snapshot",
+     "extract",
+     "serialize"
+    ],
+    "note": "extractor.js indexes the live DOM; the serializer turns it into the prompt."
+   },
+   {
+    "id": "think",
+    "label": "Think",
+    "focus": [
+     "serialize",
+     "decide",
+     "finish"
+    ],
+    "note": "A model or an outer agent reads the text and picks exactly one action."
+   },
+   {
+    "id": "act",
+    "label": "Act",
+    "focus": [
+     "execute",
+     "act_js",
+     "settle",
+     "snapshot"
+    ],
+    "note": "actions.js performs the verb, settle.js waits for quiet, then indices are rebuilt."
+   }
+  ],
+  "legend": {
+   "entries": {
+    "frontend": {
+     "label": "Injected JS"
+    },
+    "backend": {
+     "label": "Python engine"
+    },
+    "external": {
+     "label": "Decides"
+    }
+   }
+  }
+ },
+ "lanes": [
+  {
+   "id": "driver",
+   "label": "Model or outer agent"
+  },
+  {
+   "id": "engine",
+   "label": "txtwrght engine (Python)"
+  },
+  {
+   "id": "page",
+   "label": "In the page: dom/*.js"
+  }
+ ],
+ "phases": [
+  {
+   "id": "p_observe",
+   "label": "Observe",
+   "fromCol": 0,
+   "toCol": 2
+  },
+  {
+   "id": "p_think",
+   "label": "Think",
+   "fromCol": 3,
+   "toCol": 3,
+   "variant": "emphasis"
+  },
+  {
+   "id": "p_act",
+   "label": "Act",
+   "fromCol": 4,
+   "toCol": 5,
+   "variant": "dashed"
+  }
+ ],
+ "mainPath": [
+  "snapshot",
+  "extract",
+  "serialize",
+  "decide",
+  "execute",
+  "act_js",
+  "settle"
+ ],
+ "nodes": [
+  {
+   "id": "snapshot",
+   "lane": "engine",
+   "col": 0,
+   "type": "backend",
+   "label": "snapshot()",
+   "sublabel": "browser.py",
+   "width": 132
+  },
+  {
+   "id": "extract",
+   "lane": "page",
+   "col": 1,
+   "type": "frontend",
+   "label": "extractor.js",
+   "sublabel": "index live DOM",
+   "tag": "*[n] = new",
+   "width": 132
+  },
+  {
+   "id": "serialize",
+   "lane": "engine",
+   "col": 2,
+   "type": "backend",
+   "label": "Serializer",
+   "sublabel": "indexed text",
+   "width": 132
+  },
+  {
+   "id": "decide",
+   "lane": "driver",
+   "col": 3,
+   "type": "external",
+   "label": "Decide",
+   "sublabel": "one action",
+   "width": 132
+  },
+  {
+   "id": "finish",
+   "lane": "driver",
+   "col": 5,
+   "type": "external",
+   "label": "done / fail",
+   "sublabel": "ends the loop",
+   "width": 132
+  },
+  {
+   "id": "execute",
+   "lane": "engine",
+   "col": 4,
+   "type": "backend",
+   "label": "tools.py",
+   "sublabel": "click \u00b7 type \u00b7 scroll",
+   "width": 132
+  },
+  {
+   "id": "act_js",
+   "lane": "page",
+   "col": 4,
+   "type": "frontend",
+   "label": "actions.js",
+   "sublabel": "real DOM event",
+   "width": 132
+  },
+  {
+   "id": "settle",
+   "lane": "page",
+   "col": 5,
+   "type": "frontend",
+   "label": "settle.js",
+   "sublabel": "DOM-quiet wait",
+   "width": 132
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "from": "snapshot",
+   "to": "extract",
+   "label": "evaluate"
+  },
+  {
+   "id": "e2",
+   "from": "extract",
+   "to": "serialize",
+   "label": "flat tree"
+  },
+  {
+   "id": "e3",
+   "from": "serialize",
+   "to": "decide",
+   "label": "prompt",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e4",
+   "from": "decide",
+   "to": "execute",
+   "label": "tool call",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e5",
+   "from": "execute",
+   "to": "act_js"
+  },
+  {
+   "id": "e6",
+   "from": "act_js",
+   "to": "settle",
+   "fromSide": "right",
+   "toSide": "left",
+   "route": "straight"
+  },
+  {
+   "id": "e7",
+   "from": "settle",
+   "to": "snapshot",
+   "label": "re-index",
+   "variant": "dashed",
+   "role": "return"
+  },
+  {
+   "id": "e8",
+   "from": "decide",
+   "to": "finish",
+   "label": "done",
+   "variant": "dashed",
+   "role": "branch"
+  }
+ ],
+ "cards": [
+  {
+   "dot": "cyan",
+   "title": "Indices are per snapshot",
+   "items": [
+    "Every action invalidates them"
+   ]
+  },
+  {
+   "dot": "emerald",
+   "title": "dom/*.js",
+   "items": [
+    "Three window registries"
+   ]
+  },
+  {
+   "dot": "amber",
+   "title": "Two drivers",
+   "items": [
+    "run: LLM \u00b7 session: outer agent"
+   ]
+  }
+ ]
+}

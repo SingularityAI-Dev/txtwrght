@@ -1,0 +1,183 @@
+{
+ "schema_version": 1,
+ "diagram_type": "dataflow",
+ "meta": {
+  "title": "Distill: pay the model once",
+  "locale": "en",
+  "quality_profile": "showcase",
+  "views": [
+   {
+    "id": "record",
+    "label": "Record identity",
+    "focus": [
+     "describe",
+     "trace"
+    ],
+    "note": "actions.js describes the target at action time; indices die with the run."
+   },
+   {
+    "id": "rebuild",
+    "label": "Rebuild selectors",
+    "focus": [
+     "trace",
+     "load",
+     "selector",
+     "script"
+    ],
+    "note": "Selectors come from recorded identity, never from step-local indices."
+   },
+   {
+    "id": "trust",
+    "label": "Verify before trust",
+    "focus": [
+     "script",
+     "verify"
+    ],
+    "note": "Secrets become environment lookups; --verify replays before anything runs unattended."
+   }
+  ],
+  "viewBox": [
+   1000,
+   400
+  ],
+  "legend": {
+   "entries": {
+    "database": {
+     "label": "artifact on disk"
+    }
+   }
+  }
+ },
+ "stages": [
+  {
+   "label": "Run (model in loop)"
+  },
+  {
+   "label": "Recorded"
+  },
+  {
+   "label": "txtwrght distill"
+  },
+  {
+   "label": "Staged (no model)"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "describe",
+   "type": "frontend",
+   "label": "actions.js",
+   "sublabel": "describe(el)",
+   "stage": 0,
+   "row": 0,
+   "tag": "at action time"
+  },
+  {
+   "id": "trace",
+   "type": "database",
+   "label": "trace.jsonl",
+   "sublabel": "steps + elements",
+   "stage": 1,
+   "row": 0,
+   "tag": "passwords scrubbed"
+  },
+  {
+   "id": "load",
+   "type": "backend",
+   "label": "load_run",
+   "sublabel": "parse steps",
+   "stage": 2,
+   "row": 0
+  },
+  {
+   "id": "selector",
+   "type": "backend",
+   "label": "selector_for",
+   "sublabel": "id \u00b7 name \u00b7 aria \u00b7 css",
+   "stage": 2,
+   "row": 1
+  },
+  {
+   "id": "script",
+   "type": "database",
+   "label": "script.py",
+   "sublabel": "plain Playwright",
+   "stage": 3,
+   "row": 0,
+   "tag": "never auto-registered"
+  },
+  {
+   "id": "verify",
+   "type": "security",
+   "label": "--verify",
+   "sublabel": "secrets from os.environ",
+   "stage": 3,
+   "row": 1,
+   "tag": "zero tokens"
+  }
+ ],
+ "flows": [
+  {
+   "from": "describe",
+   "to": "trace",
+   "label": "element identity",
+   "variant": "emphasis",
+   "route": "straight"
+  },
+  {
+   "from": "trace",
+   "to": "load",
+   "label": "recorded run",
+   "variant": "emphasis",
+   "route": "straight"
+  },
+  {
+   "from": "load",
+   "to": "selector",
+   "label": "target element",
+   "route": "straight",
+   "fromSide": "bottom",
+   "toSide": "top",
+   "labelAt": [
+    530,
+    212
+   ]
+  },
+  {
+   "from": "selector",
+   "to": "script",
+   "label": "locator",
+   "variant": "emphasis",
+   "route": "vertical-channel"
+  },
+  {
+   "from": "script",
+   "to": "verify",
+   "label": "replay",
+   "variant": "emphasis",
+   "route": "straight",
+   "fromSide": "bottom",
+   "toSide": "top",
+   "labelAt": [
+    745,
+    212
+   ]
+  }
+ ],
+ "cards": [
+  {
+   "dot": "amber",
+   "title": "Identity, not indices",
+   "items": [
+    "id \u00b7 name \u00b7 aria-label \u00b7 css path"
+   ]
+  },
+  {
+   "dot": "rose",
+   "title": "Guardrails",
+   "items": [
+    "Passwords scrubbed, scripts staged for review"
+   ]
+  }
+ ]
+}

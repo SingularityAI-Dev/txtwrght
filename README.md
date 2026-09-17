@@ -16,8 +16,15 @@ Playwright drives a real Chromium, a DOM extractor serializes the live page to i
 One repo: the engine (`src/txtwrght`) plus the Claude Code binding (`claude/`). See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the split.
 
 <p align="center">
-  <img src="docs/assets/hero-layers.svg" alt="txtwrght sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer." width="100%"/>
+  <a href="docs/architecture/txtwrght.architecture.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/architecture-dark.png"/>
+      <img src="docs/architecture/architecture-light.png" alt="txtwrght architecture: Claude Code drives the session CLI and the agent loop asks an LLM endpoint for one action; both act through Browser + tools, which calls the three in-page payloads extractor.js, actions.js and settle.js in Chromium. The serializer turns the flat tree into indexed text; runs record to trace.jsonl, which txtwrght distill turns into a staged Playwright script that replays against Chromium." width="100%"/>
+    </picture>
+  </a>
 </p>
+
+<sub>Interactive version: [`txtwrght.architecture.html`](docs/architecture/txtwrght.architecture.html), generated with archify from [`txtwrght.architecture.json`](docs/architecture/txtwrght.architecture.json).</sub> Every node links to the source line it stands for, with guided views for the driven, autonomous and distilled modes. GitHub shows HTML as source, so download it and open it locally.
 
 ---
 
@@ -57,8 +64,15 @@ United Kingdom />
 ## The loop
 
 <p align="center">
-  <img src="docs/assets/observe-think-act-loop.svg" alt="Animated loop: observe the indexed page, think one action, act on it through Playwright, then observe again. Indices are only valid for the snapshot that produced them." width="100%"/>
+  <a href="docs/architecture/observe-act-loop.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/loop-dark.png"/>
+      <img src="docs/architecture/loop-light.png" alt="Observe, think, act: snapshot() evaluates extractor.js in the page, the serializer turns its flat tree into indexed text, a model or outer agent decides one action, tools.py runs it through actions.js, settle.js waits for the DOM to go quiet, and the loop re-indexes. done or fail ends it." width="100%"/>
+    </picture>
+  </a>
 </p>
+
+<sub>Interactive version: [`observe-act-loop.html`](docs/architecture/observe-act-loop.html), generated with archify from [`observe-act-loop.workflow.json`](docs/architecture/observe-act-loop.workflow.json).</sub>
 
 **Observe.** The extractor re-walks the live DOM and reindexes.
 **Think.** One reflection, one tool call. `click`, `input_text`, `select_dropdown_option`, `scroll`, `scroll_horizontally`, `wait`, `ask_user`, `done`.
@@ -95,8 +109,15 @@ txtwrght distill traces/run-<id>.jsonl --verify
 ```
 
 <p align="center">
-  <img src="docs/assets/distill-flow.svg" alt="A recorded trace is distilled into a plain Playwright script, verified by replay, and staged for review, no model left in the runtime path." width="100%"/>
+  <a href="docs/architecture/distill.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/distill-dark.png"/>
+      <img src="docs/architecture/distill-light.png" alt="Distill: actions.js records element identity at action time into trace.jsonl; txtwrght distill parses the run, rebuilds selectors from id, name, aria-label and css path, writes a plain Playwright script, and --verify replays it with secrets read from os.environ and no model." width="100%"/>
+    </picture>
+  </a>
 </p>
+
+<sub>Interactive version: [`distill.html`](docs/architecture/distill.html), generated with archify from [`distill.dataflow.json`](docs/architecture/distill.dataflow.json).</sub>
 
 Selectors are rebuilt from element identity recorded *at action time* (id, name, aria-label, css path), never from the step-local indices, because indices die the moment the run that produced them ends. Passwords are scrubbed at trace time and come back as `os.environ` lookups in the generated script, never literals. Scripts stage for review and are never auto-registered; `--verify` replays before you trust it.
 
@@ -143,19 +164,6 @@ All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with 
 | `claude` binding | Claude Code drives the session CLI, proven on a real login: done |
 | Distillation | Trace → script, replay-verified, two live proofs (a login, a redirect chain): done |
 | Second-model gate | Same smoke suite on a non-Claude model, to isolate contract from prompt: deferred, no credential wired up yet |
-
----
-
-## Architecture
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/architecture-dark.png"/>
-    <img src="docs/architecture/architecture-light.png" alt="txtwrght architecture: Claude Code drives the session CLI, the agent loop asks an LLM endpoint for one action, both act through Browser + tools, which evaluates the dom/*.js payloads in Chromium; the serializer turns the flat tree into indexed text; runs record to trace.jsonl, which txtwrght distill turns into a staged Playwright script that replays against Chromium." width="100%"/>
-  </picture>
-</p>
-
-Every node in the [interactive version](docs/architecture/txtwrght.architecture.html) links to the source line it stands for, with guided views for the driven, autonomous and distilled modes. Download it and open it locally; GitHub shows HTML as source. It is generated with [archify](https://github.com/tt-a1i/archify) from [`txtwrght.architecture.json`](docs/architecture/txtwrght.architecture.json), so regenerate it rather than editing the HTML.
 
 ---
 

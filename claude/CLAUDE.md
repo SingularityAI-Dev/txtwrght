@@ -13,6 +13,17 @@ live in `../txtwrght/src/txtwrght/session.py` and are covered by `tests/test_ses
 
 ## The design in one paragraph
 
+<p align="center">
+  <a href="../docs/architecture/observe-act-loop.html">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="../docs/architecture/loop-dark.png"/>
+      <img src="../docs/architecture/loop-light.png" alt="Observe, think, act: snapshot() evaluates extractor.js in the page, the serializer turns its flat tree into indexed text, a model or outer agent decides one action, tools.py runs it through actions.js, settle.js waits for the DOM to go quiet, and the loop re-indexes. done or fail ends it." width="100%"/>
+    </picture>
+  </a>
+</p>
+
+<sub>Interactive version: [`observe-act-loop.html`](../docs/architecture/observe-act-loop.html), generated with archify from [`observe-act-loop.workflow.json`](../docs/architecture/observe-act-loop.workflow.json).</sub> In this binding, Claude Code is the "Model or outer agent" lane.
+
 `txtwrght` (Python, Playwright, headless, text-only DOM, zero screenshots) exposes two modes.
 Mode 1 is autonomous: an LLM behind an OpenAI-compatible API runs the observe, think, act
 loop internally; that mode needs nothing from this directory beyond `.env` configuration.

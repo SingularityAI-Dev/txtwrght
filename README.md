@@ -163,12 +163,6 @@ Two things fall out of that shape. A Chrome MV3 extension may not evaluate sourc
 
 ---
 
-## Third-party attribution
-
-The DOM extractor (`src/txtwrght/dom/extractor.js`) and serializer (`src/txtwrght/dom/serializer.py`) are ported from [page-agent](https://github.com/alibaba/page-agent) (MIT), itself derived from [browser-use](https://github.com/browser-use/browser-use) (MIT, Copyright (c) 2024 Gregor Zunic). Full notice chain in [`LICENSE`](LICENSE).
-
----
-
 ## Tests
 
 ```bash

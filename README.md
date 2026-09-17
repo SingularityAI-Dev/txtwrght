@@ -13,7 +13,7 @@ Playwright drives a real Chromium, a DOM extractor serializes the live page to i
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-3776ab)](pyproject.toml)
 
-One repo: the engine (`src/txtwrght`) plus both runtime bindings (`claude/`, `gemini/`), folded together on 2026-08-23 because three repos for two `SKILL.md`/`GEMINI.md` files was ceremony the content never earned. See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the split.
+One repo: the engine (`src/txtwrght`) plus the Claude Code binding (`claude/`). See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the split.
 
 <p align="center">
   <img src="docs/assets/hero-layers.svg" alt="txtwrght sits between a real browser and whatever is driving it (a model, an outer agent, or nothing at all) as the missing text-only interface layer." width="100%"/>
@@ -77,7 +77,7 @@ txtwrght run "log in with username tomsmith and password SuperSecretPassword!" \
   --url https://the-internet.herokuapp.com/login
 ```
 
-**Driven.** An outer agent — Claude Code, Gemini CLI, anything with a shell — is the loop. No second model. The browser stays alive between commands over a debugging port.
+**Driven.** An outer agent (Claude Code, or anything with a shell) is the loop. No second model. The browser stays alive between commands over a debugging port.
 
 ```bash
 txtwrght session start --url https://example.com
@@ -86,7 +86,7 @@ txtwrght session act click 5
 txtwrght session end
 ```
 
-`claude/` ships the `SKILL.md` for this with Claude Code; `gemini/` ships the `GEMINI.md` equivalent. Both are thin glue over the same session CLI, on purpose: any logic they need belongs in the engine, not the binding.
+`claude/` ships the `SKILL.md` for this with Claude Code. It is thin glue over the session CLI, on purpose: any logic a binding needs belongs in the engine, not the binding.
 
 **Distilled.** Once a flow is proven, freeze it. No model, no agent loop, no retry logic at replay time, just a script.
 
@@ -106,15 +106,15 @@ Selectors are rebuilt from element identity recorded *at action time* (id, name,
 
 **Cross-origin iframes are out of scope.** The extractor descends into same-origin `contentDocument` (tested, works) but doesn't bridge cross-origin frame boundaries, which browsers block by design without a cooperating protocol on both sides. A task needing to act inside a cross-origin frame won't see into it.
 
-**No vision, ever, by design.** If a task genuinely needs to read pixels — a canvas chart with no accessible data, a CAPTCHA — txtwrght isn't the tool. It trades that capability for cheap, precise, auditable text-only reasoning on the far larger set of tasks that don't need it.
+**No vision, ever, by design.** If a task genuinely needs to read pixels (a canvas chart with no accessible data, a CAPTCHA), txtwrght isn't the tool. It trades that capability for cheap, precise, auditable text-only reasoning on the far larger set of tasks that don't need it.
 
 ---
 
 ## How this differs from browser-use
 
-[browser-use](https://github.com/browser-use/browser-use) popularized the pattern txtwrght builds on: index interactive elements, serialize to text, one action per LLM step. txtwrght owes it and [page-agent](https://github.com/alibaba/page-agent) (which ported and extended the pattern) direct credit; the extractor and serializer here are a Playwright-native port, not a from-scratch reinvention. Full attribution chain below.
+[browser-use](https://github.com/browser-use/browser-use) popularized the pattern txtwrght builds on: index interactive elements, serialize to text, one action per LLM step. txtwrght owes it and [page-agent](https://github.com/alibaba/page-agent) (which ported and extended the pattern) direct credit; the extractor and serializer here are a Playwright-native port, not a from-scratch reinvention. Full attribution chain in [`LICENSE`](LICENSE).
 
-The difference is what happens *after* a run succeeds. browser-use's unit of value is the agent step; txtwrght's is the distilled script. A login flow driven by browser-use costs an LLM call every single time it runs. The same flow through `txtwrght distill` costs an LLM call exactly once, and every replay after that is a Playwright script with a `--verify` gate and zero token spend. txtwrght is also runtime-agnostic in a specific sense browser-use isn't: the same engine serves an autonomous LLM loop, a driven outer-agent loop (Claude Code, Gemini CLI), and a distilled zero-model script from one shared extractor and tool set, rather than one agent-loop product.
+The difference is what happens *after* a run succeeds. browser-use's unit of value is the agent step; txtwrght's is the distilled script. A login flow driven by browser-use costs an LLM call every single time it runs. The same flow through `txtwrght distill` costs an LLM call exactly once, and every replay after that is a Playwright script with a `--verify` gate and zero token spend. txtwrght is also runtime-agnostic in a specific sense browser-use isn't: the same engine serves an autonomous LLM loop, a driven outer-agent loop (Claude Code), and a distilled zero-model script from one shared extractor and tool set, rather than one agent-loop product.
 
 ---
 
@@ -138,12 +138,24 @@ All build phases closed. The Phase 1 exit gate, a 10-task live smoke suite with 
 
 | | |
 |---|---|
-| Engine core | Extractor, serializer, tools, agent loop, tracing — done |
-| Hardening | Popups, dialogs, settle, same-origin iframes, structured logs — done |
-| `claude` binding | Claude Code drives the session CLI, proven on a real login — done |
-| `gemini` binding | Gemini CLI equivalent, same shape — done |
-| Distillation | Trace → script, replay-verified, two live proofs (a login, a redirect chain) — done |
-| Second-model gate | Same smoke suite on a non-Claude model, to isolate contract from prompt — deferred, no credential wired up yet |
+| Engine core | Extractor, serializer, tools, agent loop, tracing: done |
+| Hardening | Popups, dialogs, settle, same-origin iframes, structured logs: done |
+| `claude` binding | Claude Code drives the session CLI, proven on a real login: done |
+| Distillation | Trace → script, replay-verified, two live proofs (a login, a redirect chain): done |
+| Second-model gate | Same smoke suite on a non-Claude model, to isolate contract from prompt: deferred, no credential wired up yet |
+
+---
+
+## Architecture
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/architecture-dark.png"/>
+    <img src="docs/architecture/architecture-light.png" alt="txtwrght architecture: Claude Code drives the session CLI, the agent loop asks an LLM endpoint for one action, both act through Browser + tools, which evaluates the dom/*.js payloads in Chromium; the serializer turns the flat tree into indexed text; runs record to trace.jsonl, which txtwrght distill turns into a staged Playwright script that replays against Chromium." width="100%"/>
+  </picture>
+</p>
+
+Every node in the [interactive version](docs/architecture/txtwrght.architecture.html) links to the source line it stands for, with guided views for the driven, autonomous and distilled modes. Download it and open it locally; GitHub shows HTML as source. It is generated with [archify](https://github.com/tt-a1i/archify) from [`txtwrght.architecture.json`](docs/architecture/txtwrght.architecture.json), so regenerate it rather than editing the HTML.
 
 ---
 
@@ -159,7 +171,7 @@ Everything txtwrght runs inside the page is a file under [`src/txtwrght/dom/`](s
 
 Evaluating one of these files assigns a registry onto `window`; Python then calls into that registry by name and passes arguments, rather than shipping a function body per call. Assignment is idempotent, so a caller re-installs instead of tracking whether a navigation wiped the previous document.
 
-Two things fall out of that shape. A Chrome MV3 extension may not evaluate source text it received over a wire, so a payload that is ever going to be shared with an extension driver has to already exist as a file a content script can load — that is the constraint driving the layout. And JavaScript in a `.js` file can be loaded straight into Node, which is what the second test suite below does.
+Two things fall out of that shape. A Chrome MV3 extension may not evaluate source text it received over a wire, so a payload that is ever going to be shared with an extension driver has to already exist as a file a content script can load. That is the constraint driving the layout. And JavaScript in a `.js` file can be loaded straight into Node, which is what the second test suite below does.
 
 ---
 

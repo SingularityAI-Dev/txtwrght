@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "txtwrght architecture",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/SingularityAI-Dev/txtwrght",
+      "provider": "github",
+      "revision": "7b82f78d790cb09a3ba9ef597f3b0b8f51f15016"
+    },
+    "views": [
+      { "id": "driven", "label": "Driven mode", "focus": ["claude", "session", "browser", "payloads", "chromium"], "note": "An outer agent is the loop; the browser lives between CLI calls over CDP." },
+      { "id": "autonomous", "label": "Autonomous mode", "focus": ["llm", "agent", "serializer", "browser", "payloads"], "note": "txtwrght run: the engine's own loop asks an LLM for one action per step." },
+      { "id": "distilled", "label": "Distilled mode", "focus": ["trace", "distill", "script", "chromium"], "note": "A recorded run becomes a plain Playwright script; replay spends no tokens." }
+    ]
+  },
+  "components": [
+    { "id": "llm", "type": "cloud", "label": "LLM endpoints", "sublabel": "LLM_1..3 failover", "pos": [40, 130], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/llm.py", "line": 289, "label": "LLMClient" }] },
+    { "id": "agent", "type": "backend", "label": "Agent loop", "sublabel": "txtwrght run", "pos": [250, 130], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/agent.py", "line": 43, "label": "Agent" }] },
+    { "id": "serializer", "type": "backend", "label": "Serializer", "sublabel": "prompt contract", "pos": [460, 130], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/dom/serializer.py", "label": "serializer" }] },
+    { "id": "claude", "type": "external", "label": "Claude Code", "sublabel": "claude/SKILL.md", "pos": [40, 300], "size": [140, 60],
+      "sources": [{ "path": "claude/SKILL.md", "label": "Claude binding" }] },
+    { "id": "session", "type": "backend", "label": "Session CLI", "sublabel": "txtwrght session", "pos": [250, 300], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/session.py", "line": 206, "label": "connect()" }] },
+    { "id": "browser", "type": "backend", "label": "Browser + tools", "sublabel": "Playwright actions", "pos": [460, 300], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/browser.py", "line": 23, "label": "Browser" }, { "path": "src/txtwrght/tools.py", "line": 54, "label": "click_element_by_index" }] },
+    { "id": "payloads", "type": "frontend", "label": "dom/*.js", "sublabel": "extract · actions · settle", "pos": [670, 300], "size": [150, 60], "tag": "window registries",
+      "sources": [{ "path": "src/txtwrght/dom/js.py", "line": 38, "label": "install()" }, { "path": "src/txtwrght/dom/extractor.js", "label": "extractor" }, { "path": "src/txtwrght/dom/actions.js", "label": "actions" }] },
+    { "id": "chromium", "type": "external", "label": "Chromium", "sublabel": "live page", "pos": [890, 300], "size": [140, 60] },
+    { "id": "trace", "type": "database", "label": "trace.jsonl", "sublabel": "passwords scrubbed", "pos": [460, 460], "size": [140, 60],
+      "sources": [{ "path": "src/txtwrght/trace.py", "line": 32, "label": "Trace" }] },
+    { "id": "distill", "type": "backend", "label": "txtwrght distill", "sublabel": "selectors from identity", "pos": [670, 460], "size": [150, 60],
+      "sources": [{ "path": "src/txtwrght/distill.py", "line": 155, "label": "to_script" }] },
+    { "id": "script", "type": "database", "label": "Playwright script", "sublabel": "staged, --verify", "pos": [890, 460], "size": [140, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "txtwrght engine: src/txtwrght", "wraps": ["agent", "serializer", "session", "browser", "payloads", "trace", "distill"] }
+  ],
+  "connections": [
+    { "id": "claude-drives", "from": "claude", "to": "session", "label": "shell", "variant": "emphasis" },
+    { "id": "session-browser", "from": "session", "to": "browser", "label": "CDP", "labelDy": 16 },
+    { "id": "browser-payloads", "from": "browser", "to": "payloads", "label": "evaluate" },
+    { "id": "payloads-page", "from": "payloads", "to": "chromium", "label": "DOM" },
+    { "id": "agent-llm", "from": "agent", "to": "llm", "label": "LLMClient" },
+    { "id": "agent-browser", "from": "agent", "to": "browser" },
+    { "id": "browser-serializer", "from": "browser", "to": "serializer", "label": "flat tree" },
+    { "id": "serializer-agent", "from": "serializer", "to": "agent", "label": "indexed text" },
+    { "id": "browser-trace", "from": "browser", "to": "trace", "label": "record", "variant": "dashed", "labelAt": [530, 410] },
+    { "id": "trace-distill", "from": "trace", "to": "distill" },
+    { "id": "distill-script", "from": "distill", "to": "script" },
+    { "id": "script-replay", "from": "script", "to": "chromium", "label": "replay", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Three modes, one engine", "items": ["Autonomous: txtwrght run calls an LLM per step", "Driven: an outer agent is the loop, no second model", "Distilled: zero model at replay time"] },
+    { "dot": "emerald", "title": "Injected JavaScript", "items": ["All in-page code lives in dom/*.js", "Each file installs a window registry; Python calls it by name", "Loadable by an MV3 content script later"] },
+    { "dot": "violet", "title": "Two test suites", "items": ["Python against real Chromium", "Node against happy-dom for the payloads"] }
+  ]
+}

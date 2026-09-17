@@ -1,6 +1,6 @@
 # dom-agent
 
-CLI-first, headless, text-only DOM browser agent. One Python engine (`txtwrght`) plus per-runtime bindings (`claude`, `gemini`). See `ARCHITECTURE.md` for the engine/binding split.
+CLI-first, headless, text-only DOM browser agent. One Python engine (`txtwrght`) plus a Claude Code binding (`claude`). See `ARCHITECTURE.md` for the engine/binding split.
 
 ## Agent skills
 

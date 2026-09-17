@@ -37,7 +37,7 @@ ecosystem while operating the page.
 - `SKILL.md`: a Claude Code skill teaching the snapshot, decide, act loop, the indexed
   element format (`[n]` prefixes, `*[n]` for new elements, tab-depth nesting), and the rule
   that indices are only valid for the current snapshot.
-- Thin glue only. Anything reusable across bindings (Gemini in `../gemini/`, Hermes)
+- Thin glue only. Anything reusable across runtimes (Hermes, other outer agents)
   belongs in the engine, not here. If a change here starts adding logic, push it down into
   `txtwrght` instead.
 
